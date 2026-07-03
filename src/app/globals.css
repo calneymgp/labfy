@@ -6,7 +6,7 @@
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-geist-mono);
   --font-mono: var(--font-geist-mono);
 
   --color-sidebar-ring: var(--sidebar-ring);
@@ -98,39 +98,39 @@
     transform: translateY(calc(-100% - var(--gap)));}}}
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.2rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #f5f5f0;
+  --foreground: #383838;
+  --card: #ffffff;
+  --card-foreground: #383838;
+  --popover: #ffffff;
+  --popover-foreground: #383838;
+  --primary: #383838;
+  --primary-foreground: #f5f5f0;
+  --secondary: #ecebe3;
+  --secondary-foreground: #383838;
+  --muted: #ecebe3;
+  --muted-foreground: #5a5a5a;
+  --accent: #ecebe3;
+  --accent-foreground: #383838;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #c2c0b6;
+  --input: #c2c0b6;
+  --ring: #5a5a5a;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #f5f5f0;
+  --sidebar-foreground: #383838;
+  --sidebar-primary: #383838;
+  --sidebar-primary-foreground: #f5f5f0;
+  --sidebar-accent: #ecebe3;
+  --sidebar-accent-foreground: #383838;
+  --sidebar-border: #c2c0b6;
+  --sidebar-ring: #5a5a5a;
 
   --st-pending: #6b7280;
   --st-running: #3b82f6;
@@ -179,9 +179,14 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(rgba(56, 56, 56, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
   html {
-    @apply font-sans;
+    @apply font-sans scroll-smooth;
+  }
+  ::selection {
+    @apply bg-foreground text-background;
   }
 }
 
