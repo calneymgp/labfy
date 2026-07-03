@@ -2,7 +2,7 @@ import { Users } from "lucide-react";
 
 export default function ComunidadePage() {
   return (
-    <div className="mx-auto flex max-w-5xl flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
+    <div className="mx-auto flex max-w-5xl flex-1 flex-col items-center justify-center gap-4 px-4 py-24 text-center">
       <div className="flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-card">
         <Users className="h-5 w-5 text-muted-foreground" />
       </div>

@@ -13,7 +13,7 @@ export function V6Shell({
   return (
     <SidebarProvider>
       <V6Sidebar user={user} />
-      <SidebarInset>
+      <SidebarInset className="overflow-hidden">
         <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <SidebarTrigger />
           <div className="ml-auto flex items-center gap-2">
@@ -30,7 +30,7 @@ export function V6Shell({
             </a>
           </div>
         </header>
-        <main className="flex flex-1 flex-col px-4 py-6 md:px-6 lg:px-8">{children}</main>
+        <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Box, Map, Users, ChevronUp, LogOut, LogIn } from "lucide-react";
+import { Home, Users, Palette, ChevronUp, LogOut, LogIn } from "lucide-react";
 import { signOut } from "@/app/entrar/actions";
 import {
   Sidebar,
@@ -36,9 +36,8 @@ type NavItem = {
 
 const mainNav: NavItem[] = [
   { title: "Home", href: "/", icon: Home },
-  { title: "Projetos", href: "/projetos", icon: Box },
-  { title: "Roadmap", href: "/roadmap", icon: Map },
   { title: "Comunidade", href: "/comunidade", icon: Users, soon: true },
+  { title: "Design System", href: "/design-system", icon: Palette },
 ];
 
 export type SidebarUser = { email: string } | null;
