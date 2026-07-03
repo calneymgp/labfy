@@ -61,10 +61,14 @@ Modo: **claro fixo**. Não há toggle de dark mode no produto.
 - **Sidebar**: navegação principal do web app (`variant="inset" collapsible="icon"`), tokens próprios (`--sidebar*`) espelhando a paleta paper/ink. Itens com feature futura levam badge `Em breve` (estilo `pending`) à direita do label.
 - **Header**: sticky, `border-b`, fundo `bg-background/95 backdrop-blur`.
 - **Cards**: fundo branco puro (`bg-card`), `border border-border`, hover troca a borda para `border-foreground` (ink) — nunca cor de destaque.
-- **Botões**: sem preenchimento sólido colorido. Borda fina (`border border-border`) com hover trocando a borda para ink (`hover:border-foreground`). Dentro de painéis pretos (hero), o par se inverte: CTA primário vira `bg-white text-black`, secundário fica `border-white/30 text-white`.
+- **Botões**: o padrão neutro (`default`/`outline`/`secondary`/`ghost`/`link`) segue sem preenchimento sólido colorido — borda fina (`border border-border`) com hover trocando a borda para ink (`hover:border-foreground`). Dentro de painéis pretos (hero), o par se inverte: CTA primário vira `bg-white text-black`, secundário fica `border-white/30 text-white`. **Exceção deliberada**: ações semânticas que exigem cor usam preenchimento sólido nos tokens de status — `success` (`bg-secure text-white`), `destructive`/erro (`bg-exposed text-white`), `warning`/alerta (`bg-vulnerable text-black`). `default` (ink sólido) cobre "Ok/Confirmar"; `outline` cobre "Cancelar" — nenhum dos dois precisa de cor, são ações neutras por natureza. Variantes definidas em `src/components/ui/button.tsx` (cva).
 - **Badges de status**: `variant="outline"`, cor semântica do token de status (§2), texto `text-[0.6rem]`.
+- **Tabelas**: `src/components/ui/table.tsx` (shadcn padrão) — já herda `border-border`/`bg-muted` dos tokens sem alteração. Header em `text-[10px] font-bold tracking-widest uppercase`, mesma assinatura dos labels CLI. Envolver em `rounded-sm border border-border bg-card` para bater com o padrão de card.
+- **Gráficos**: `src/components/ui/chart.tsx` (shadcn + Recharts). Cores da série sempre referenciando os tokens de status (`var(--color-running)`, `var(--color-secure)`, etc.) via `ChartConfig`, nunca hex novo. Grid/eixos usam `var(--border)`.
 - **Painel de alto contraste** (hero, modais): fundo `#000000`, texto `text-white`/`text-white/70`, usado com moderação — é o único lugar do produto onde a paleta clara é abandonada.
 - **Animação**: Framer Motion disponível no projeto para fade/slide de entrada, mas uso pontual — não é uma dependência ativa do sistema hoje.
+
+Referência viva de todos os componentes acima (com exemplos renderizados): rota `/design-system` (`src/app/design-system/`).
 
 ## 6. Como manter a consistência
 
@@ -72,6 +76,6 @@ Ao adicionar uma página ou componente novo:
 
 1. Reaproveite os tokens de `globals.css` — não hardcode hex novo fora dos já documentados aqui.
 2. `rounded-sm` por padrão; só suba para `rounded-md` em casos pontuais já existentes (ex.: avatar da sidebar).
-3. Todo botão parte de borda fina + hover ink, não de preenchimento sólido, exceto dentro de um painel preto.
+3. Todo botão parte de borda fina + hover ink, não de preenchimento sólido — exceto dentro de um painel preto, ou quando a ação é semântica (`success`/`destructive`/`warning`, ver §5).
 4. Labels de metadado/status seguem `text-[10px] font-bold tracking-widest uppercase`.
 5. Geist Mono é a única fonte — não introduzir uma sans-serif.
