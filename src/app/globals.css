@@ -244,3 +244,37 @@
   background: var(--secondary);
   border-radius: 9999px;
 }
+
+/* react-phone-number-input — casado com o Design System (campo único, bandeiras) */
+.labfy-phone-input {
+  --PhoneInputCountryFlag-borderColor: var(--border);
+  --PhoneInputCountryFlag-borderColor--focus: var(--foreground);
+  --PhoneInputCountrySelectArrow-color--focus: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2rem;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  padding: 0 0.625rem;
+  transition: border-color 0.15s ease;
+}
+.labfy-phone-input:focus-within {
+  border-color: var(--foreground);
+}
+.labfy-phone-input .PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  padding: 0;
+}
+.labfy-phone-input .PhoneInputInput::placeholder {
+  color: var(--muted-foreground);
+}

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { validatePhone, formatPhoneE164, type PhoneInput } from "@/lib/phone";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 export async function checkEmailExists(email: string): Promise<{ exists: boolean; error?: string }> {
   const trimmed = email.trim().toLowerCase();
@@ -18,13 +18,12 @@ export async function checkEmailExists(email: string): Promise<{ exists: boolean
 
 export async function requestOtp(
   email: string,
-  phone?: PhoneInput
+  phone?: string
 ): Promise<{ error?: string }> {
   const trimmed = email.trim().toLowerCase();
 
-  if (phone) {
-    const phoneError = validatePhone(phone);
-    if (phoneError) return { error: phoneError };
+  if (phone && !isValidPhoneNumber(phone)) {
+    return { error: "Número de WhatsApp inválido." };
   }
 
   const supabase = await createClient();
@@ -32,7 +31,7 @@ export async function requestOtp(
     email: trimmed,
     options: {
       shouldCreateUser: true,
-      data: phone ? { phone: formatPhoneE164(phone) } : undefined,
+      data: phone ? { phone } : undefined,
     },
   });
 
