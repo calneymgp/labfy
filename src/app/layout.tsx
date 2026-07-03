@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { V6Shell } from "./components/shell";
+import { createClient } from "@/lib/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,18 +20,23 @@ export const metadata: Metadata = {
     "Portfolio, produtos, comunidade e conteúdo. O hub de tecnologia do Calney.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <V6Shell>{children}</V6Shell>
+        <V6Shell user={user ? { email: user.email ?? "" } : null}>{children}</V6Shell>
       </body>
     </html>
   );

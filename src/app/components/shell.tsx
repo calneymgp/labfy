@@ -1,12 +1,18 @@
 "use client";
 
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { V6Sidebar } from "./sidebar";
+import { V6Sidebar, type SidebarUser } from "./sidebar";
 
-export function V6Shell({ children }: { children: React.ReactNode }) {
+export function V6Shell({
+  children,
+  user,
+}: {
+  children: React.ReactNode;
+  user: SidebarUser;
+}) {
   return (
     <SidebarProvider>
-      <V6Sidebar />
+      <V6Sidebar user={user} />
       <SidebarInset>
         <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <SidebarTrigger />
@@ -24,7 +30,7 @@ export function V6Shell({ children }: { children: React.ReactNode }) {
             </a>
           </div>
         </header>
-        <main className="flex-1 px-4 py-6 md:px-6 lg:px-8">{children}</main>
+        <main className="flex flex-1 flex-col px-4 py-6 md:px-6 lg:px-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

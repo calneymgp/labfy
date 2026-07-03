@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Home, Box, Map, ChevronUp, User2, LifeBuoy, Settings } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Home, Box, Map, Users, ChevronUp, LogOut, LogIn } from "lucide-react";
+import { signOut } from "@/app/entrar/actions";
 import {
   Sidebar,
   SidebarHeader,
@@ -31,55 +31,27 @@ type NavItem = {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  /** anchor id within /v6, if any */
-  section?: string;
+  soon?: boolean;
 };
 
 const mainNav: NavItem[] = [
-  { title: "Início", href: "/", icon: Home, section: "inicio" },
-  { title: "Projetos", href: "/#projetos", icon: Box, section: "projetos" },
-  { title: "Roadmap", href: "/#roadmap", icon: Map, section: "roadmap" },
+  { title: "Home", href: "/", icon: Home },
+  { title: "Projetos", href: "/projetos", icon: Box },
+  { title: "Roadmap", href: "/roadmap", icon: Map },
+  { title: "Comunidade", href: "/comunidade", icon: Users, soon: true },
 ];
 
-/** Tracks the section currently in view via IntersectionObserver. */
-function useActiveSection(sectionIds: string[]) {
-  const [active, setActive] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const sections = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-    if (sections.length === 0) return;
+export type SidebarUser = { email: string } | null;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-96px 0px -60% 0px", threshold: [0, 0.25, 0.5, 1] }
-    );
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
-  }, [sectionIds]);
-  return active;
-}
-
-export function V6Sidebar() {
+export function V6Sidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname();
-  const sectionIds = React.useMemo(() => mainNav.map((i) => i.section!).filter(Boolean), []);
-  const activeSection = useActiveSection(sectionIds);
+  const router = useRouter();
 
-  const handleSectionClick = (e: React.MouseEvent<HTMLAnchorElement>, item: NavItem) => {
-    if (!item.section) return;
-    e.preventDefault();
-    const el = document.getElementById(item.section);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      history.replaceState(null, "", `/v6#${item.section}`);
-    }
-  };
+  async function handleSignOut() {
+    await signOut();
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -108,26 +80,23 @@ export function V6Sidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNav.map((item) => {
-                const isHome = item.section === "inicio";
-                const active = isHome
-                  ? pathname === "/" && (activeSection === "inicio" || activeSection === null)
-                  : activeSection === item.section;
-                return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                      isActive={active}
-                      tooltip={item.title}
-                      render={
-                        <Link href={item.href} onClick={(e) => handleSectionClick(e, item)} />
-                      }
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {mainNav.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={item.title}
+                    render={<Link href={item.href} />}
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
+                    {item.soon && (
+                      <span className="ml-auto rounded-sm border border-pending/20 bg-pending/10 px-1 py-0 font-mono text-[9px] font-bold tracking-widest text-pending uppercase group-data-[collapsible=icon]:hidden">
+                        Em breve
+                      </span>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -136,39 +105,40 @@ export function V6Sidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <SidebarMenuButton
-                    tooltip="calney"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <SidebarMenuButton
+                      tooltip={user.email}
+                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    />
+                  }
+                >
+                  <Image
+                    src="/labfy-mark.png"
+                    alt={user.email}
+                    width={24}
+                    height={24}
+                    className="size-7 shrink-0 rounded-md ring-1 ring-sidebar-border"
                   />
-                }
-              >
-                <Image
-                  src="/labfy-mark.png"
-                  alt="calney"
-                  width={24}
-                  height={24}
-                  className="size-7 shrink-0 rounded-md ring-1 ring-sidebar-border"
-                />
-                <span>calney</span>
-                <ChevronUp className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="min-w-56">
-                <DropdownMenuLabel>calney</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem render={<a href="https://github.com/calneymgp" target="_blank" rel="noopener noreferrer" />}>
-                  <User2 /> GitHub
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings /> Configurações
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <LifeBuoy /> Suporte
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <span className="truncate">{user.email}</span>
+                  <ChevronUp className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start" className="min-w-56">
+                  <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut /> Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <SidebarMenuButton tooltip="Entrar" render={<Link href="/entrar" />}>
+                <LogIn />
+                <span>Entrar</span>
+              </SidebarMenuButton>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
