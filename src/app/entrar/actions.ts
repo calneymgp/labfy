@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { isValidPhoneNumber } from "react-phone-number-input";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export async function checkEmailExists(email: string): Promise<{ exists: boolean; error?: string }> {
   const trimmed = email.trim().toLowerCase();

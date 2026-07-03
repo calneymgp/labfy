@@ -28,21 +28,21 @@ export function EntrarForm() {
     setError(null);
     setLoading(true);
 
-    const { exists, error: checkError } = await checkEmailExists(email);
-    if (checkError) {
-      setError(checkError);
-      setLoading(false);
-      return;
-    }
+    try {
+      const { exists, error: checkError } = await checkEmailExists(email);
+      if (checkError) return setError(checkError);
 
-    if (exists) {
-      const { error: otpError } = await requestOtp(email);
+      if (exists) {
+        const { error: otpError } = await requestOtp(email);
+        if (otpError) return setError(otpError);
+        setStep("otp");
+      } else {
+        setStep("phone");
+      }
+    } catch {
+      setError("Algo deu errado. Tente novamente.");
+    } finally {
       setLoading(false);
-      if (otpError) return setError(otpError);
-      setStep("otp");
-    } else {
-      setLoading(false);
-      setStep("phone");
     }
   }
 
@@ -56,10 +56,15 @@ export function EntrarForm() {
     }
 
     setLoading(true);
-    const { error: otpError } = await requestOtp(email, phone);
-    setLoading(false);
-    if (otpError) return setError(otpError);
-    setStep("otp");
+    try {
+      const { error: otpError } = await requestOtp(email, phone);
+      if (otpError) return setError(otpError);
+      setStep("otp");
+    } catch {
+      setError("Algo deu errado. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleOtpSubmit(e: React.FormEvent) {
@@ -67,20 +72,30 @@ export function EntrarForm() {
     setError(null);
     setLoading(true);
 
-    const { error: verifyError } = await verifyOtp(email, code);
-    setLoading(false);
-    if (verifyError) return setError(verifyError);
+    try {
+      const { error: verifyError } = await verifyOtp(email, code);
+      if (verifyError) return setError(verifyError);
 
-    router.push("/");
-    router.refresh();
+      router.push("/");
+      router.refresh();
+    } catch {
+      setError("Algo deu errado. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleResend() {
     setError(null);
     setLoading(true);
-    const { error: otpError } = await requestOtp(email, phone);
-    setLoading(false);
-    if (otpError) setError(otpError);
+    try {
+      const { error: otpError } = await requestOtp(email, phone);
+      if (otpError) setError(otpError);
+    } catch {
+      setError("Algo deu errado. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
