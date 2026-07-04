@@ -9,7 +9,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Clock, Star, UserPlus, Link2, Globe, Sparkles, Bot, Wand2, Network } from "lucide-react";
 import { ChartDemo } from "./chart-demo";
+import { CommentThread } from "./comment-thread";
+import { SkillFormDialog } from "./skill-form-dialog";
 
 const colors = [
   { name: "Paper", token: "--background", value: "#F5F5F0", swatch: "bg-background border" },
@@ -41,6 +63,37 @@ const statusMap = {
   secure: { label: "Pago", className: "bg-secure/10 text-secure border-secure/20" },
   exposed: { label: "Falhou", className: "bg-exposed/10 text-exposed border-exposed/20" },
 };
+
+const members = [
+  { name: "calney", role: "Fundador", bio: "Construindo o laboratório." },
+  { name: "beta.tester", role: "Membro", bio: "Testando tudo antes de todo mundo." },
+  { name: "labfy.dev", role: "Bot", bio: "Automação da casa." },
+];
+
+const articles = [
+  {
+    tag: "Engenharia",
+    title: "Por que trocamos magic link por código OTP",
+    excerpt: "Um código de 6 dígitos é mais rápido de digitar do que abrir o app de e-mail e clicar num link.",
+    author: "calney",
+    date: "03 jul",
+    readTime: "4 min",
+  },
+  {
+    tag: "Design System",
+    title: "Terminal Paper: por que quase monocromático",
+    excerpt: "Preto, papel e bordas finas — como decidimos a paleta do Labfy e quando abrir exceção.",
+    author: "calney",
+    date: "01 jul",
+    readTime: "6 min",
+  },
+];
+
+const skills = [
+  { icon: Bot, name: "Revisor de PR", category: "Agente", author: "calney", uses: 128 },
+  { icon: Wand2, name: "Gerador de copy", category: "Prompt", author: "beta.tester", uses: 64 },
+  { icon: Sparkles, name: "Resumo de reunião", category: "Automação", author: "calney", uses: 41 },
+];
 
 function SectionHeader({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return (
@@ -188,6 +241,275 @@ export default function DesignSystemPage() {
         />
         <div className="rounded-sm border border-border bg-card p-6">
           <ChartDemo />
+        </div>
+      </section>
+
+      {/* Avatar */}
+      <section className="space-y-4">
+        <SectionHeader
+          eyebrow="Identidade"
+          title="Avatar"
+          description="Tamanhos, indicador de status e agrupamento — base para perfil, comunidade e comentários."
+        />
+        <div className="flex flex-wrap items-center gap-6 rounded-sm border border-border bg-card p-6">
+          <Avatar size="sm">
+            <AvatarImage src="" alt="calney" />
+            <AvatarFallback className="font-mono text-[10px] uppercase">CL</AvatarFallback>
+          </Avatar>
+          <Avatar>
+            <AvatarImage src="" alt="calney" />
+            <AvatarFallback className="font-mono uppercase">CL</AvatarFallback>
+          </Avatar>
+          <Avatar size="lg">
+            <AvatarImage src="" alt="calney" />
+            <AvatarFallback className="font-mono uppercase">CL</AvatarFallback>
+          </Avatar>
+          <Avatar>
+            <AvatarFallback className="font-mono uppercase">CL</AvatarFallback>
+            <AvatarBadge className="bg-secure" />
+          </Avatar>
+          <AvatarGroup>
+            <Avatar>
+              <AvatarFallback className="font-mono uppercase">CL</AvatarFallback>
+            </Avatar>
+            <Avatar>
+              <AvatarFallback className="font-mono uppercase">BT</AvatarFallback>
+            </Avatar>
+            <Avatar>
+              <AvatarFallback className="font-mono uppercase">LB</AvatarFallback>
+            </Avatar>
+            <AvatarGroupCount>+2</AvatarGroupCount>
+          </AvatarGroup>
+        </div>
+      </section>
+
+      {/* Comunidade */}
+      <section className="space-y-4">
+        <SectionHeader
+          eyebrow="Comunidade"
+          title="Membros & comentários"
+          description="Card de membro (diretório) e thread de comentários aninhada."
+        />
+        <div className="grid gap-3 sm:grid-cols-3">
+          {members.map((m) => (
+            <Card key={m.name} className="hover:border-foreground transition-colors">
+              <CardHeader className="p-4">
+                <div className="flex items-start gap-3">
+                  <Avatar>
+                    <AvatarFallback className="font-mono uppercase">{m.name.slice(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <CardTitle className="font-heading text-sm">{m.name}</CardTitle>
+                      <Badge variant="outline" className="text-[0.6rem] px-1 py-0">
+                        {m.role}
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-xs">{m.bio}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardFooter className="px-4 pb-4">
+                <Button variant="outline" size="sm" className="w-full rounded-sm">
+                  <UserPlus className="h-3.5 w-3.5" />
+                  Seguir
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+        <div className="rounded-sm border border-border bg-card p-6">
+          <CommentThread />
+        </div>
+      </section>
+
+      {/* Blog */}
+      <section className="space-y-4">
+        <SectionHeader eyebrow="Conteúdo" title="Blog" description="Card de artigo, breadcrumb e paginação." />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#">Blog</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Artigo</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {articles.map((a) => (
+            <Card key={a.title} className="hover:border-foreground transition-colors">
+              <CardHeader className="space-y-2 p-4">
+                <Badge variant="outline" className="w-fit text-[0.6rem] px-1 py-0">
+                  {a.tag}
+                </Badge>
+                <CardTitle className="font-heading text-sm leading-snug">{a.title}</CardTitle>
+                <CardDescription className="text-xs">{a.excerpt}</CardDescription>
+              </CardHeader>
+              <CardFooter className="flex items-center justify-between px-4 pb-4">
+                <div className="flex items-center gap-2">
+                  <Avatar size="sm">
+                    <AvatarFallback className="font-mono text-[10px] uppercase">
+                      {a.author.slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-[11px] text-muted-foreground">{a.author}</span>
+                </div>
+                <div className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+                  <span>{a.date}</span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {a.readTime}
+                  </span>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" className="rounded-sm" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#" isActive className="rounded-sm">
+                1
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#" className="rounded-sm">
+                2
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" className="rounded-sm" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </section>
+
+      {/* Skills de IA */}
+      <section className="space-y-4">
+        <SectionHeader
+          eyebrow="Marketplace"
+          title="Skills de IA"
+          description="Card de skill publicada pela comunidade, filtro por categoria e formulário de criação."
+        />
+        <Tabs defaultValue="todas">
+          <div className="flex items-center justify-between gap-3">
+            <TabsList>
+              <TabsTrigger value="todas">Todas</TabsTrigger>
+              <TabsTrigger value="agente">Agentes</TabsTrigger>
+              <TabsTrigger value="prompt">Prompts</TabsTrigger>
+              <TabsTrigger value="automacao">Automação</TabsTrigger>
+            </TabsList>
+            <SkillFormDialog />
+          </div>
+          <TabsContent value="todas" className="mt-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              {skills.map((s) => (
+                <Card key={s.name} className="hover:border-foreground transition-colors">
+                  <CardHeader className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border bg-muted/50">
+                        <s.icon className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <CardTitle className="font-heading text-sm">{s.name}</CardTitle>
+                          <Badge variant="outline" className="text-[0.6rem] px-1 py-0">
+                            {s.category}
+                          </Badge>
+                        </div>
+                        <CardDescription className="flex items-center gap-2 text-xs">
+                          <span>por {s.author}</span>
+                          <span className="flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
+                            <Star className="h-3 w-3" />
+                            {s.uses}
+                          </span>
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </section>
+
+      {/* Perfil */}
+      <section className="space-y-4">
+        <SectionHeader
+          eyebrow="Conta"
+          title="Perfil"
+          description="Header com banner, avatar grande e abas para organizar posts/skills/atividade."
+        />
+        <div className="overflow-hidden rounded-sm border border-border bg-card">
+          <div className="h-20 bg-black" />
+          <div className="space-y-4 px-6 pb-6">
+            <div className="-mt-8 flex items-end justify-between">
+              <Avatar size="lg" className="ring-4 ring-card">
+                <AvatarFallback className="font-mono text-base uppercase">CL</AvatarFallback>
+              </Avatar>
+              <Button variant="outline" size="sm" className="rounded-sm">
+                Editar perfil
+              </Button>
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-heading text-base font-semibold">calney</h3>
+              <p className="text-xs text-muted-foreground">Fundador do Labfy — laboratório de produtos e conteúdo técnico.</p>
+              <div className="flex items-center gap-3 pt-1 text-muted-foreground">
+                <Link2 className="h-3.5 w-3.5" />
+                <Globe className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <Tabs defaultValue="posts">
+              <TabsList>
+                <TabsTrigger value="posts">Posts</TabsTrigger>
+                <TabsTrigger value="skills">Skills</TabsTrigger>
+                <TabsTrigger value="atividade">Atividade</TabsTrigger>
+              </TabsList>
+              <TabsContent value="posts" className="mt-4 text-xs text-muted-foreground">
+                2 artigos publicados.
+              </TabsContent>
+              <TabsContent value="skills" className="mt-4 text-xs text-muted-foreground">
+                1 skill publicada.
+              </TabsContent>
+              <TabsContent value="atividade" className="mt-4 text-xs text-muted-foreground">
+                Entrou no Labfy em jun/2026.
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </section>
+
+      {/* Visão em grafo — lacuna documentada */}
+      <section className="space-y-4">
+        <SectionHeader
+          eyebrow="Em pesquisa"
+          title="Visão em grafo"
+          description="Ainda não existe no catálogo — mapeado, não implementado."
+        />
+        <div className="flex items-start gap-3 rounded-sm border border-dashed border-border bg-card p-6">
+          <Network className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Pesquisei no shadcn e no Shoogle (135+ registries) por um componente de grafo de nós (rede de
+            pessoas/conteúdo/skills conectados) — não existe nenhum pronto; o catálogo cobre gráficos de
+            barra/linha/pizza (Recharts) e contribution-graph (heatmap estilo GitHub), que são coisas diferentes.
+            Caminho recomendado quando formos construir isso de verdade:{" "}
+            <code className="text-[11px] text-foreground">@xyflow/react</code> (React Flow) — é o que o próprio SDK
+            de IA da Vercel usa por baixo dos panos nos componentes <code className="text-[11px]">node</code>/
+            <code className="text-[11px]">edge</code> do registry <code className="text-[11px]">@ai-elements</code>{" "}
+            (pensado pra diagramas de agentes/skills, encaixa bem na nossa proposta). Alternativa mais simples se o
+            grafo for pequeno: <code className="text-[11px]">react-force-graph</code>. Nenhuma dependência nova foi
+            instalada — isso é só o mapeamento do caminho.
+          </p>
         </div>
       </section>
     </div>
