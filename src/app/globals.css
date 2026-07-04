@@ -278,3 +278,33 @@
 .labfy-phone-input .PhoneInputInput::placeholder {
   color: var(--muted-foreground);
 }
+
+/* React Flow — visão em grafo, tema "Obsidian" limpo casado com o Design System */
+.labfy-graph {
+  --xy-background-color-default: transparent;
+  --xy-edge-stroke-default: var(--border);
+  --xy-edge-stroke-width-default: 1;
+  --xy-edge-stroke-selected-default: var(--foreground);
+  --xy-attribution-background-color-default: transparent;
+  --xy-controls-button-background-color-default: var(--card);
+  --xy-controls-button-background-color-hover-default: var(--muted);
+  --xy-controls-button-color-default: var(--muted-foreground);
+  --xy-controls-button-color-hover-default: var(--foreground);
+  --xy-controls-button-border-color-default: var(--border);
+  --xy-controls-box-shadow-default: none;
+  --xy-minimap-background-color-default: var(--card);
+  --xy-selection-background-color-default: color-mix(in srgb, var(--foreground) 6%, transparent);
+  --xy-selection-border-default: 1px solid var(--border);
+}
+.labfy-graph .react-flow__controls {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+.labfy-graph .react-flow__controls-button {
+  border-bottom-color: var(--border);
+}
+.labfy-graph .react-flow__attribution {
+  display: none;
+}

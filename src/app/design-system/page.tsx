@@ -28,10 +28,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Star, UserPlus, Link2, Globe, Sparkles, Bot, Wand2, Network } from "lucide-react";
+import { Clock, Star, UserPlus, Link2, Globe, Sparkles, Bot, Wand2 } from "lucide-react";
 import { ChartDemo } from "./chart-demo";
 import { CommentThread } from "./comment-thread";
 import { SkillFormDialog } from "./skill-form-dialog";
+import { KnowledgeGraph } from "./graph/knowledge-graph";
 
 const colors = [
   { name: "Paper", token: "--background", value: "#F5F5F0", swatch: "bg-background border" },
@@ -489,28 +490,32 @@ export default function DesignSystemPage() {
         </div>
       </section>
 
-      {/* Visão em grafo — lacuna documentada */}
+      {/* Visão em grafo */}
       <section className="space-y-4">
         <SectionHeader
-          eyebrow="Em pesquisa"
+          eyebrow="Conhecimento"
           title="Visão em grafo"
-          description="Ainda não existe no catálogo — mapeado, não implementado."
+          description="React Flow (@xyflow/react), nós flutuantes ligados por linha reta — estilo Obsidian, sem fluxograma."
         />
-        <div className="flex items-start gap-3 rounded-sm border border-dashed border-border bg-card p-6">
-          <Network className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Pesquisei no shadcn e no Shoogle (135+ registries) por um componente de grafo de nós (rede de
-            pessoas/conteúdo/skills conectados) — não existe nenhum pronto; o catálogo cobre gráficos de
-            barra/linha/pizza (Recharts) e contribution-graph (heatmap estilo GitHub), que são coisas diferentes.
-            Caminho recomendado quando formos construir isso de verdade:{" "}
-            <code className="text-[11px] text-foreground">@xyflow/react</code> (React Flow) — é o que o próprio SDK
-            de IA da Vercel usa por baixo dos panos nos componentes <code className="text-[11px]">node</code>/
-            <code className="text-[11px]">edge</code> do registry <code className="text-[11px]">@ai-elements</code>{" "}
-            (pensado pra diagramas de agentes/skills, encaixa bem na nossa proposta). Alternativa mais simples se o
-            grafo for pequeno: <code className="text-[11px]">react-force-graph</code>. Nenhuma dependência nova foi
-            instalada — isso é só o mapeamento do caminho.
-          </p>
+        <KnowledgeGraph />
+        <div className="flex flex-wrap items-center gap-4">
+          {[
+            { label: "Membro", color: "bg-foreground" },
+            { label: "Skill", color: "bg-running" },
+            { label: "Artigo", color: "bg-secure" },
+            { label: "Tópico", color: "bg-pending" },
+          ].map((l) => (
+            <div key={l.label} className="flex items-center gap-1.5">
+              <span className={`h-2 w-2 rounded-full ${l.color}`} />
+              <span className="font-mono text-[10px] tracking-wide text-muted-foreground uppercase">{l.label}</span>
+            </div>
+          ))}
         </div>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          Arraste os nós, dê zoom — a linha recalcula a interseção com a borda do círculo em tempo real
+          (<code className="text-[11px] text-foreground">src/app/design-system/graph/geometry.ts</code>), sem handles
+          fixos de fluxograma. Tamanho do nó = quão conectado ele é na rede.
+        </p>
       </section>
     </div>
   );
