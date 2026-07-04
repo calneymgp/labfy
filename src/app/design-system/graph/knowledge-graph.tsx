@@ -19,8 +19,8 @@ import { useForceLayout } from "./use-force-layout";
 const nodeTypes = { graphNode: GraphNode };
 const edgeTypes = { floating: FloatingEdge };
 
-const MIN_SIZE = 26;
-const MAX_SIZE = 64;
+const MIN_SIZE = 9;
+const MAX_SIZE = 21;
 
 type RawNode = { id: string; label: string; kind: GraphNodeKind };
 
@@ -64,14 +64,15 @@ function buildInitialGraph(): { nodes: Node[]; edges: Edge[] } {
   const maxDegree = Math.max(...degree.values(), 1);
 
   const nodes: Node[] = rawNodes.map((n, i) => {
-    const ratio = (degree.get(n.id) ?? 0) / maxDegree;
+    const nodeDegree = degree.get(n.id) ?? 0;
+    const ratio = nodeDegree / maxDegree;
     const size = Math.round(MIN_SIZE + (MAX_SIZE - MIN_SIZE) * ratio);
     const angle = (i / rawNodes.length) * Math.PI * 2;
     return {
       id: n.id,
       type: "graphNode",
       position: { x: 260 + Math.cos(angle) * 180, y: 190 + Math.sin(angle) * 180 },
-      data: { label: n.label, kind: n.kind, size },
+      data: { label: n.label, kind: n.kind, size, degree: nodeDegree },
       draggable: true,
     };
   });
