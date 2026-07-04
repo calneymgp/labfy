@@ -1,0 +1,69 @@
+<!--
+  Template do e-mail de login/cadastro (Supabase Auth "Magic Link", disparado por
+  signInWithOtp). O labfydev usa fluxo 100% OTP por código — por isso este template
+  mostra {{ .Token }} em destaque e NÃO usa {{ .ConfirmationURL }} (o app não tem
+  rota de callback pra tratar clique em link mágico).
+
+  Estilo: Design System "Terminal Paper" (ver DESIGN_SYSTEM.md na raiz do repo) —
+  paper/ink/border, mono, header preto cinematográfico, radius reduzido.
+
+  Como aplicar: Supabase Dashboard → Authentication → Email Templates → Magic Link,
+  ou via Management API (PATCH /v1/projects/{ref}/config/auth,
+  campo mailer_templates_magic_link_content). Assunto sugerido em
+  mailer_subjects_magic_link: "{{ .Token }} é seu código de acesso Labfy".
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F5F0;padding:40px 16px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;background-color:#FFFFFF;border:1px solid #C2C0B6;border-radius:4px;overflow:hidden;">
+        <!-- Header preto -->
+        <tr>
+          <td align="center" style="background-color:#000000;padding:28px 24px;">
+            <img src="https://labfy.dev/labfy-mark.png" width="32" height="32" alt="Labfy" style="display:block;margin:0 auto 10px;border-radius:2px;" />
+            <span style="font-family:'Courier New',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:700;letter-spacing:4px;color:#FFFFFF;text-transform:uppercase;">
+              Labfy
+            </span>
+          </td>
+        </tr>
+
+        <!-- Corpo -->
+        <tr>
+          <td style="padding:36px 32px 28px;font-family:'Courier New',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;">
+            <p style="margin:0 0 8px;font-size:10px;font-weight:700;letter-spacing:2px;color:#5A5A5A;text-transform:uppercase;">
+              Acesso sem senha
+            </p>
+            <h1 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#383838;letter-spacing:-0.01em;">
+              Seu código de acesso
+            </h1>
+            <p style="margin:0 0 24px;font-size:13px;line-height:1.6;color:#5A5A5A;">
+              Digite o código abaixo em <strong style="color:#383838;">labfy.dev/entrar</strong> para continuar. Ele expira em 10 minutos.
+            </p>
+
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+              <tr>
+                <td align="center" style="background-color:#F5F5F0;border:1px solid #C2C0B6;border-radius:4px;padding:20px;">
+                  <span style="font-family:'Courier New',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:34px;font-weight:700;letter-spacing:10px;color:#383838;">
+                    {{ .Token }}
+                  </span>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0;font-size:11px;line-height:1.6;color:#5A5A5A;">
+              Se você não pediu esse código, ignore este e-mail com segurança — ninguém consegue entrar na sua conta sem ele.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Rodapé -->
+        <tr>
+          <td style="padding:18px 32px;border-top:1px solid #C2C0B6;font-family:'Courier New',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;">
+            <span style="font-size:10px;letter-spacing:2px;color:#5A5A5A;text-transform:uppercase;">
+              &lt; labfy.dev &gt;
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
