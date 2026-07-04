@@ -32,7 +32,7 @@ import { Clock, Star, UserPlus, Link2, Globe, Sparkles, Bot, Wand2 } from "lucid
 import { ChartDemo } from "./chart-demo";
 import { CommentThread } from "./comment-thread";
 import { SkillFormDialog } from "./skill-form-dialog";
-import { KnowledgeGraph } from "./graph/knowledge-graph";
+import { KnowledgeGraph } from "./graph/knowledge-graph-loader";
 
 const colors = [
   { name: "Paper", token: "--background", value: "#F5F5F0", swatch: "bg-background border" },
