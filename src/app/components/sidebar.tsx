@@ -21,6 +21,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -125,7 +126,9 @@ export function V6Sidebar({ user }: { user: SidebarUser }) {
                   <ChevronUp className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" align="start" className="min-w-56">
-                  <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut /> Sair
