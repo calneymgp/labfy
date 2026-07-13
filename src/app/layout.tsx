@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
 import { V6Shell } from "./components/shell";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,6 +26,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -51,7 +55,9 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <V6Shell user={sidebarUser}>{children}</V6Shell>
+        <V6Shell user={sidebarUser} defaultOpen={defaultOpen}>
+          {children}
+        </V6Shell>
       </body>
     </html>
   );
