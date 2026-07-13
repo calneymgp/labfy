@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Users, Palette, ChevronUp, LogOut, LogIn, UserRound } from "lucide-react";
+import { Home, Users, Palette, Waypoints, ChevronUp, LogOut, LogIn, UserRound } from "lucide-react";
 import { signOut } from "@/app/entrar/actions";
 import { initialsOf } from "@/lib/profile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -40,6 +40,7 @@ type NavItem = {
 const mainNav: NavItem[] = [
   { title: "Home", href: "/", icon: Home },
   { title: "Comunidade", href: "/comunidade", icon: Users, soon: true },
+  { title: "MindMap", href: "/mindmap", icon: Waypoints },
   { title: "Design System", href: "/design-system", icon: Palette },
 ];
 
