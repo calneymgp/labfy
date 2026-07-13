@@ -39,13 +39,16 @@ export async function updateProfile(input: {
     (HARNESS_OPTIONS as readonly string[]).includes(h)
   );
 
-  const { error } = await supabase.from("profiles").upsert({
-    id: user.id,
-    full_name: fullName,
-    headline,
-    preferred_models: preferredModels,
-    preferred_harnesses: preferredHarnesses,
-  });
+  // a linha do perfil é criada pelo trigger on_auth_user_created no signup
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: fullName,
+      headline,
+      preferred_models: preferredModels,
+      preferred_harnesses: preferredHarnesses,
+    })
+    .eq("id", user.id);
 
   if (error) return { error: "Não foi possível salvar o perfil. Tente novamente." };
 
@@ -69,7 +72,8 @@ export async function commitAvatar(): Promise<{ error?: string; avatarUrl?: stri
 
   const { error } = await supabase
     .from("profiles")
-    .upsert({ id: user.id, avatar_url: avatarUrl });
+    .update({ avatar_url: avatarUrl })
+    .eq("id", user.id);
 
   if (error) return { error: "Não foi possível salvar a foto. Tente novamente." };
 

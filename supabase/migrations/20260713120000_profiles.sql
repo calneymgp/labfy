@@ -1,31 +1,15 @@
--- Perfis da comunidade Labfy
--- Aplicar no SQL Editor do Supabase (projeto mavrvyfrzojqfsvmafha)
+-- Perfil da comunidade Labfy — aditivo sobre a tabela public.profiles já existente
+-- (criada no fluxo de cadastro com id, email, phone, created_at + trigger
+-- on_auth_user_created/handle_new_user e RLS select/update do próprio dono).
+-- Aplicada via Supabase Management API em 2026-07-13.
 
-create table if not exists public.profiles (
-  id uuid primary key references auth.users (id) on delete cascade,
-  full_name text not null default '',
-  headline text not null default '',
-  avatar_url text,
-  preferred_models text[] not null default '{}',
-  preferred_harnesses text[] not null default '{}',
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-alter table public.profiles enable row level security;
-
-create policy "perfis são públicos para leitura"
-  on public.profiles for select
-  using (true);
-
-create policy "dono insere o próprio perfil"
-  on public.profiles for insert
-  with check (auth.uid() = id);
-
-create policy "dono atualiza o próprio perfil"
-  on public.profiles for update
-  using (auth.uid() = id)
-  with check (auth.uid() = id);
+alter table public.profiles
+  add column if not exists full_name text not null default '',
+  add column if not exists headline text not null default '',
+  add column if not exists avatar_url text,
+  add column if not exists preferred_models text[] not null default '{}',
+  add column if not exists preferred_harnesses text[] not null default '{}',
+  add column if not exists updated_at timestamptz not null default now();
 
 -- updated_at automático
 create or replace function public.profiles_set_updated_at()
@@ -38,31 +22,20 @@ begin
 end;
 $$;
 
+drop trigger if exists profiles_updated_at on public.profiles;
 create trigger profiles_updated_at
   before update on public.profiles
   for each row execute function public.profiles_set_updated_at();
 
--- cria o perfil automaticamente quando o usuário se cadastra
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  insert into public.profiles (id) values (new.id)
-  on conflict (id) do nothing;
-  return new;
-end;
-$$;
+-- upsert defensivo do próprio perfil (linha normalmente já criada pelo trigger de signup)
+drop policy if exists profiles_insert_own on public.profiles;
+create policy profiles_insert_own
+  on public.profiles for insert to authenticated
+  with check (auth.uid() = id);
 
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
-
--- backfill dos usuários já existentes
-insert into public.profiles (id)
-select id from auth.users
+-- backfill: usuários criados antes do trigger existir
+insert into public.profiles (id, email)
+select id, lower(email) from auth.users
 on conflict (id) do nothing;
 
 -- bucket público de avatares (máx 2MB, só imagem)
@@ -74,19 +47,23 @@ on conflict (id) do update
       allowed_mime_types = array['image/webp', 'image/jpeg', 'image/png'];
 
 -- cada usuário só escreve dentro da própria pasta ({uid}/...)
+drop policy if exists "avatar: leitura pública" on storage.objects;
 create policy "avatar: leitura pública"
   on storage.objects for select
   using (bucket_id = 'avatars');
 
+drop policy if exists "avatar: dono envia" on storage.objects;
 create policy "avatar: dono envia"
   on storage.objects for insert to authenticated
   with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
+drop policy if exists "avatar: dono atualiza" on storage.objects;
 create policy "avatar: dono atualiza"
   on storage.objects for update to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text)
   with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
+drop policy if exists "avatar: dono remove" on storage.objects;
 create policy "avatar: dono remove"
   on storage.objects for delete to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);

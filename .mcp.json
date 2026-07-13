@@ -12,6 +12,18 @@
     "shoogle": {
       "type": "http",
       "url": "https://mcp.shoogle.dev/mcp"
+    },
+    "supabase-labfy": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=mavrvyfrzojqfsvmafha"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_PAT}"
+      }
     }
   }
 }
