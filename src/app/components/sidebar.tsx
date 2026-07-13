@@ -3,8 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Users, Palette, ChevronUp, LogOut, LogIn } from "lucide-react";
+import { Home, Users, Palette, ChevronUp, LogOut, LogIn, UserRound } from "lucide-react";
 import { signOut } from "@/app/entrar/actions";
+import { initialsOf } from "@/lib/profile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarHeader,
@@ -41,7 +43,11 @@ const mainNav: NavItem[] = [
   { title: "Design System", href: "/design-system", icon: Palette },
 ];
 
-export type SidebarUser = { email: string } | null;
+export type SidebarUser = {
+  email: string;
+  name: string | null;
+  avatarUrl: string | null;
+} | null;
 
 export function V6Sidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname();
@@ -110,26 +116,32 @@ export function V6Sidebar({ user }: { user: SidebarUser }) {
                 <DropdownMenuTrigger
                   render={
                     <SidebarMenuButton
-                      tooltip={user.email}
+                      tooltip={user.name || user.email}
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                     />
                   }
                 >
-                  <Image
-                    src="/labfy-mark.png"
-                    alt={user.email}
-                    width={24}
-                    height={24}
-                    className="size-7 shrink-0 rounded-md ring-1 ring-sidebar-border"
-                  />
-                  <span className="truncate">{user.email}</span>
+                  <Avatar size="sm" className="size-7 shrink-0">
+                    {user.avatarUrl && (
+                      <AvatarImage src={user.avatarUrl} alt={user.name || user.email} />
+                    )}
+                    <AvatarFallback className="text-[10px]">
+                      {initialsOf(user.name ?? "", user.email)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="truncate">{user.name || user.email}</span>
                   <ChevronUp className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" align="start" className="min-w-56">
                   <DropdownMenuGroup>
-                    <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                    <DropdownMenuLabel className="truncate">
+                      {user.name || user.email}
+                    </DropdownMenuLabel>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem render={<Link href="/perfil" />}>
+                    <UserRound /> Perfil
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut /> Sair
                   </DropdownMenuItem>

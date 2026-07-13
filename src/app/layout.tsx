@@ -30,13 +30,28 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  let sidebarUser = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    sidebarUser = {
+      email: user.email ?? "",
+      name: profile?.full_name || null,
+      avatarUrl: profile?.avatar_url ?? null,
+    };
+  }
+
   return (
     <html
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <V6Shell user={user ? { email: user.email ?? "" } : null}>{children}</V6Shell>
+        <V6Shell user={sidebarUser}>{children}</V6Shell>
       </body>
     </html>
   );
