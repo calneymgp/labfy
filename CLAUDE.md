@@ -9,11 +9,12 @@ integrar no `main`, desde que o gate esteja verde. Autorização durável: aja, 
 ## Gate de integração — obrigatório antes de qualquer merge no `main`
 
 ```
-pnpm build && pnpm lint      # ambos verdes = green light
+pnpm typecheck && pnpm lint      # ambos verdes = green light
 ```
 
-`pnpm build` (next build) faz o type-check; `pnpm lint` (eslint) pega o resto.
-Quando existir suíte de testes ou `typecheck`, entram neste gate automaticamente.
+`pnpm typecheck` (tsc --noEmit) e `pnpm lint` (eslint). Rápido de propósito — roda a cada
+integração. Não precisa de `pnpm build` no gate (o typecheck já cobre os erros de tipo).
+Quando existir suíte de testes, ela entra aqui automaticamente.
 **Gate vermelho = não integra.** Conserte na sua branch primeiro.
 
 ## Fluxo autônomo
