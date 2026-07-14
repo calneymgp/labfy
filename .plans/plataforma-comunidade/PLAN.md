@@ -63,6 +63,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 
 **Editor Markdown (client)** — Recomendação: `@uiw/react-md-editor` (toolbar + live preview, pronto, tematizável via CSS vars, carregar com `dynamic(..., { ssr:false })`). Alternativas descartadas: `@mdxeditor/editor` (WYSIWYG, mais pesado e opinativo), `milkdown`/`tiptap` (headless, exige montar toolbar — esforço maior que "biblioteca pronta"). Confiança: **medium** — validar peer deps com **React 19 / Next 16** no momento do `pnpm add`; se conflitar, **fallback**: `<textarea>` estilizado + preview ao vivo com `react-markdown` + `remark-gfm` (zero risco de peer dep). Render de leitura usa `react-markdown` em ambos os caminhos.
 
+**War Room — orquestração (Mastra vs Trigger.dev)** — Recomendação: **Trigger.dev v4.5.0**. Confiança: **high**. A v4.5.0 traz `chat.agent`/**Session** (canal de stream durável keyed por `externalId` estável, cujos `.in`/`.out` sobrevivem a suspend/crash/idle-timeout/redeploy — o run resume e o stream reconecta do último chunk), `useTriggerChatTransport` (ChatTransport para o `useChat` do Vercel AI SDK, realtime **sem API routes**) e AI SDK 7 com tool calls nativos (web search). Isso satisfaz os requisitos duros "resumível ao reabrir o navegador", "não frágil" e "realtime" **nativamente**. Mastra descartado: exigiria construir durabilidade + resume + realtime à mão. Fontes: changelog v4.5.0, docs Realtime Streams.
+
+**War Room — pixel art (PixelLab)** — API `https://api.pixellab.ai/v2/create-image-pixflux` (Bearer). Credencial: `PIXELLAB_KEYS` (formato `nome:key;nome:key`) em `loot-hunter/.env.local`; usar o roteador `loot-hunter/scripts/pixellab-route.py --key` para pegar a conta com mais saldo. Scripts de referência de geração de personagem/animação já existem em `loot-hunter/scripts/`. Geração é **one-time** — assets salvos e versionados; a cena em runtime é composição estática dos sprites.
+
 ## Glossary
 
 - **public_profiles:** view Postgres derivada de `profiles` sem `email`/`phone`; fonte única de leitura pública de pessoas.
@@ -80,6 +84,7 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 - `supabase/migrations/` — novos `.sql` (campos de profile, view public_profiles, tabelas prompts e apps).
 - `src/app/membros/`, `src/app/prompts/`, `src/app/apps/` — páginas novas (dir).
 - `src/app/design-system/graph/use-force-layout.ts` + `src/app/mindmap/*` — extração do `<ForceGraph>` genérico.
+- **War Room:** `src/app/war-room/` (rota + cena), `src/trigger/` (tasks Trigger.dev), `trigger.config.ts`, `public/war-room/` (sprites), `supabase/migrations/` (war_room_sessions/messages), `src/app/components/sidebar.tsx` (item War Room).
 
 ---
 
@@ -340,6 +345,154 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   - [ ] existe uma rota de mapa de prompts que constrói nós a partir de `topic`/`subtopic` (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
+> 🔄 bom ponto de /clear — a War Room (task-11+) é um épico próprio; contexto fresco ajuda
+
+---
+
+## War Room — contexto e decisões (épico final, task-11 a task-15)
+
+Feature: uma "sala de guerra" pixelada onde 4 personagens-LLM debatem um prompt do usuário
+em tempo real até uma conclusão. É a maior feature do backlog — ao chegar na task-11, vale
+um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** antes de codar.
+
+**Personagens** (persona visual → modelo; o modelo exato é resolvido na execução conforme
+disponibilidade via Vercel AI SDK providers / vLLM do calneyserver — se um modelo específico
+não estiver acessível, mapear para o mais próximo e registrar no drift log):
+- **DeepSeek** — sábio chinês · modelo família DeepSeek (ex: "DeepSeek V4 Pro")
+- **Gemma** — moderno/americano · modelo família Gemma (ex: "Gemma 4 31B")
+- **Hermes** — Hermes, filho de Zeus (deus grego) · modelo família Hermes/Nous (ex: "Hermes 405B")
+- **MiniMax** — europeu · modelo família MiniMax (ex: "MiniMax M3")
+
+**Decisões-chave** (ver `## Discovery`):
+- **Orquestração:** Trigger.dev v4.5.0 (`chat.agent`/Session durável + realtime). Resume ao
+  reabrir o navegador e realtime saem de graça da plataforma — requisito duro atendido nativamente.
+- **Fluxo:** (1) usuário envia prompt → (2) fase RESEARCH: 4 agentes fazem web search em
+  paralelo com ângulos/fontes **diversificados** → (3) fase DEBATE: 10-12 turnos rotativos,
+  contexto compartilhado (todos veem tudo), streaming → (4) fase CONCLUSION: síntese final.
+- **Web search (tool):** opencrawl self-hosted (custo zero) como provider primário, exposto
+  como tool do AI SDK; cada agente é instruído a variar queries/fontes.
+- **Persistência:** Supabase (`war_room_sessions`, `war_room_messages`) como registro durável +
+  reidratação da UI e histórico; a resumibilidade em tempo real vem da Session do Trigger.dev.
+- **Pixel art:** PixelLab (one-time), sprites em `public/war-room/`, cena = composição estática
+  com highlight de quem fala.
+
+---
+
+## Tasks — War Room
+
+### task-11: War Room — fundação (Trigger.dev + schema + sidebar + rota)
+
+- **type:** `auto`
+- **effort:** `L`
+- **slice:** vertical (toca: infra Trigger.dev → schema/RLS → sidebar → rota esqueleto)
+- **depends_on:** []
+- **rollback:** `drop table war_room_messages; drop table war_room_sessions;` + remover `trigger.config.ts` e item do sidebar.
+- **read_first:**
+  - `## Discovery` (War Room — orquestração) e `## War Room — contexto e decisões`.
+  - `src/app/components/sidebar.tsx` — padrão de item.
+  - skill `triggerdev` (padrões de task/config Trigger.dev) + docs v4.5.0.
+- **files_modified:**
+  - `package.json` (modify — `@trigger.dev/sdk` v4.5.0 + AI SDK)
+  - `trigger.config.ts` (new)
+  - `supabase/migrations/<ts>_war_room.sql` (new)
+  - `src/app/components/sidebar.tsx` (modify — item "War Room" → `/war-room`, ícone sugerido `Swords`)
+  - `src/app/war-room/page.tsx` (new — esqueleto)
+- **action:**
+  1. Instalar/configurar Trigger.dev v4.5.0 (projeto, `trigger.config.ts`, `TRIGGER_SECRET_KEY` no ambiente/Coolify). Validar peer deps com React 19/Next 16.
+  2. Migration: `war_room_sessions` (id, owner_id, prompt, status, external_id, created_at) e `war_room_messages` (id, session_id, character, phase, content, turn, created_at). RLS: dono cria/lê/gerencia suas sessões; mensagens visíveis a quem lê a sessão.
+  3. Sidebar: item "War Room" → `/war-room`.
+  4. `/war-room`: página esqueleto (cena virá na task-12).
+- **acceptance:**
+  - [ ] `package.json` inclui `@trigger.dev/sdk` (grep)
+  - [ ] `trigger.config.ts` existe
+  - [ ] Migration cria `war_room_sessions` e `war_room_messages` com `owner_id` + RLS (grep)
+  - [ ] `sidebar.tsx` contém href `/war-room` (grep)
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
+### task-12: War Room — assets pixel art + cena estática
+
+- **type:** `auto`
+- **effort:** `M`
+- **slice:** vertical (toca: geração PixelLab → assets → componente de cena)
+- **depends_on:** [`task-11`]
+- **read_first:**
+  - `## Discovery` (War Room — pixel art) + `loot-hunter/scripts/pixellab-route.py` e um script de geração de referência (`hero-concepts.py`).
+- **files_modified:**
+  - `scripts/gen-war-room-pixels.mjs` (new — chama PixelLab, one-time)
+  - `public/war-room/*` (new — salão + 4 personagens 64x64)
+  - `src/app/war-room/scene.tsx` (new — composição estática dos sprites sobre o fundo)
+- **action:**
+  1. Script de geração via `create-image-pixflux` (Bearer da key roteada por `PIXELLAB_KEYS`): salão com mesa redonda + 4 personagens 64x64 fiéis às personas (sábio chinês, americano moderno, Hermes grego, europeu). Salvar em `public/war-room/`.
+  2. `scene.tsx`: compõe os 4 sprites ao redor da mesa sobre o fundo (posição absoluta), com estado de "quem está falando" (highlight/glow).
+- **acceptance:**
+  - [ ] `public/war-room/` contém ≥5 imagens (salão + 4 personagens)
+  - [ ] `scene.tsx` posiciona 4 personagens e aceita prop de "personagem ativo" (grep)
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
+### task-13: War Room — orquestração do debate (Trigger.dev task)
+
+- **type:** `auto`
+- **effort:** `L`
+- **slice:** vertical (toca: config personagens → tool web search → task durável → persistência)
+- **depends_on:** [`task-11`]
+- **read_first:**
+  - `## War Room — contexto e decisões` (fluxo research→debate→conclusion, personagens).
+  - skill `webscrapping-anything`/opencrawl para a tool de web search.
+- **files_modified:**
+  - `src/trigger/war-room-debate.ts` (new — task durável)
+  - `src/lib/war-room/characters.ts` (new — `WAR_ROOM_CHARACTERS`: id, name, persona, systemPrompt, provider/model)
+  - `src/lib/war-room/web-search.ts` (new — tool AI SDK sobre opencrawl)
+- **action:**
+  1. `WAR_ROOM_CHARACTERS` com os 4 (persona + systemPrompt + provider/model resolvível).
+  2. Tool `webSearch` (opencrawl) exposta ao AI SDK; agentes diversificam fontes.
+  3. Task Trigger.dev: fase RESEARCH (4 agentes em paralelo, cada um pesquisa) → DEBATE (10-12 turnos rotativos, contexto compartilhado) → CONCLUSION. Cada fala é persistida em `war_room_messages` e emitida no stream da Session.
+- **acceptance:**
+  - [ ] `characters.ts` define os 4 personagens (grep `deepseek|gemma|hermes|minimax`, case-insensitive)
+  - [ ] `war-room-debate.ts` grava em `war_room_messages` e cobre as 3 fases (grep `research|debate|conclusion`)
+  - [ ] `web-search.ts` exporta uma tool de busca (grep)
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
+### task-14: War Room — frontend realtime + input
+
+- **type:** `auto`
+- **effort:** `L`
+- **slice:** vertical (toca: input → disparo do run → streaming na cena)
+- **depends_on:** [`task-12`, `task-13`]
+- **read_first:**
+  - `## Discovery` (`useTriggerChatTransport`/`useChat`).
+  - `src/app/war-room/scene.tsx` (task-12) para plugar as falas.
+- **files_modified:**
+  - `src/app/war-room/war-room-client.tsx` (new — input + streaming + cena)
+  - `src/app/war-room/actions.ts` (new — cria sessão e dispara a task)
+- **action:**
+  1. Input de prompt; ao enviar, cria `war_room_sessions` e dispara a task Trigger.dev (externalId = session id).
+  2. `useChat` + `useTriggerChatTransport` streamando as falas; renderizar cada intervenção no personagem correspondente (balão/painel) + highlight na cena; conclusão final destacada.
+- **acceptance:**
+  - [ ] `war-room-client.tsx` usa `useChat`/`useTriggerChatTransport` (grep)
+  - [ ] `actions.ts` cria sessão e dispara a task com `externalId` (grep)
+  - [ ] falas são renderizadas por personagem (grep)
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
+### task-15: War Room — resumibilidade + robustez
+
+- **type:** `auto`
+- **effort:** `M`
+- **slice:** vertical (toca: resume → erro/retry → reidratação)
+- **depends_on:** [`task-14`]
+- **read_first:**
+  - `## Discovery` (Session sobrevive a refresh/crash; resume do último chunk).
+- **files_modified:**
+  - `src/app/war-room/page.tsx` (modify — reidratar sessão em aberto do usuário)
+  - `src/app/war-room/war-room-client.tsx` (modify — reconectar stream por externalId)
+  - `src/trigger/war-room-debate.ts` (modify — retries/idempotência)
+- **action:**
+  1. Ao abrir `/war-room` com sessão em andamento, reidratar de `war_room_messages` e **reconectar** o stream da Session (externalId) — retomar de onde parou.
+  2. Retries/idempotência na task; tratamento de falha de um agente sem derrubar o debate.
+- **acceptance:**
+  - [ ] reabrir a rota reconecta o stream por `externalId` (grep) e reidrata mensagens do Supabase (grep)
+  - [ ] a task define política de retry (grep `retry`)
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
 ---
 
 ## Must-Haves (goal-backward verification)
@@ -352,6 +505,7 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 - [ ] Usuário logado cria um prompt Markdown público e ele aparece em `/prompts` com o nome do autor; deslogado não cria.
 - [ ] Usuário cadastra um app no perfil e ele aparece em `/apps` com gráfico por categoria.
 - [ ] Existe ao menos um grafo helicopter view (prompts) renderizando dados reais.
+- [ ] War Room: usuário envia um prompt e vê os 4 personagens debaterem em tempo real (research → debate → conclusão); ao fechar e reabrir o navegador, a sessão retoma de onde parou.
 
 ### Artifacts (arquivos com substância real)
 - `supabase/migrations/*_public_profiles_view.sql` — cria view sem email/phone.
@@ -395,3 +549,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-02 ⏸️ aguardando smoke visual humano (Playwright/perfil exige login). NÃO bloqueia demais tasks — seguindo para task-03.
 - 2026-07-13 — task-03 ✅ colunas specialty/role/location/skills aplicadas no banco (Management API, status 201, verificadas) + form estendido (especialidade ToggleChips, cargo/local inputs, skills chips) + validação server-side. Gate verde.
 - 2026-07-13 — task-04 ✅ view public_profiles criada (201, colunas verificadas SEM email/phone, vazamento=0) + sidebar Comunidade→Membros + /membros com diretório filtrável (nome/especialidade/cargo/localização) + /comunidade redireciona. Gate verde.
+- 2026-07-13 — backlog: adicionado épico War Room (task-11 a task-15) ao fim do plano. Decisões travadas: Trigger.dev v4.5.0 (durável/realtime/resume nativo), PixelLab para sprites (creds em loot-hunter/.env.local), fluxo research→debate→conclusion, persistência Supabase. Execução continua na ordem — War Room só após task-10.
