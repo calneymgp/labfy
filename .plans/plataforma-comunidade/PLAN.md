@@ -230,10 +230,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. `/prompts`: listar prompts (mais recentes), resolver nome do autor via `public_profiles`, card com título/autor/tópico/trecho.
   4. Busca por título/corpo/tópico (`ilike`).
 - **acceptance:**
-  - [ ] Migration cria tabela `prompts` com `owner_id`, `body`, `topic` (grep)
-  - [ ] `.sql` contém policy de SELECT pública e `with check (auth.uid() = owner_id)` (grep)
-  - [ ] `sidebar.tsx` contém href `/prompts` (grep)
-  - [ ] `prompts/page.tsx` resolve autor via `public_profiles` (grep) e NÃO expõe email
+  - [x] Migration cria tabela `prompts` com `owner_id`, `body`, `topic` (grep)
+  - [x] `.sql` contém policy de SELECT pública e `with check (auth.uid() = owner_id)` (grep)
+  - [x] `sidebar.tsx` contém href `/prompts` (grep)
+  - [x] `prompts/page.tsx` resolve autor via `public_profiles` (grep) e NÃO expõe email
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-07: Prompts — editor Markdown (criar) + render (ler)
@@ -551,3 +551,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-04 ✅ view public_profiles criada (201, colunas verificadas SEM email/phone, vazamento=0) + sidebar Comunidade→Membros + /membros com diretório filtrável (nome/especialidade/cargo/localização) + /comunidade redireciona. Gate verde.
 - 2026-07-13 — backlog: adicionado épico War Room (task-11 a task-15) ao fim do plano. Decisões travadas: Trigger.dev v4.5.0 (durável/realtime/resume nativo), PixelLab para sprites (creds em loot-hunter/.env.local), fluxo research→debate→conclusion, persistência Supabase. Execução continua na ordem — War Room só após task-10.
 - 2026-07-13 — task-05 ✅ dashboard raio-X em /membros: 4 cards macro (total, Claude Code, GPT, especialidades) + Pie por especialidade + Bars por harness e localização (recharts). Agregados computados no server component. Gate verde.
+- 2026-07-13 — task-06 ✅ tabela prompts (201, RLS: select público + insert/update/delete do dono) + sidebar item Prompts + /prompts (lista + busca client-side por título/tópico/tag/corpo; autor via public_profiles em 2ª query). Gate verde.
