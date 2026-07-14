@@ -141,10 +141,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. Estender `profile-form.tsx`: select de especialidade, inputs de cargo/localização, editor de skills (multi, no padrão dos models/harnesses existentes).
   4. Estender a server action para persistir os novos campos (validação server-side, sem confiar no cliente).
 - **acceptance:**
-  - [ ] Migration `.sql` existe e contém `specialty`, `role`, `location`, `skills`
-  - [ ] `profile.ts` exporta `SPECIALTY_OPTIONS` (grep)
-  - [ ] `profile-form.tsx` referencia `specialty`, `role`, `location`, `skills` (grep)
-  - [ ] server action grava os 4 campos (grep em `actions.ts`)
+  - [x] Migration `.sql` existe e contém `specialty`, `role`, `location`, `skills`
+  - [x] `profile.ts` exporta `SPECIALTY_OPTIONS` (grep)
+  - [x] `profile-form.tsx` referencia `specialty`, `role`, `location`, `skills` (grep)
+  - [x] server action grava os 4 campos (grep em `actions.ts`)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 > 🔄 bom ponto de /clear — o plano carrega o resto
@@ -393,3 +393,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 
 - 2026-07-13 — task-01 ✅ avatar `size-28`, fundo branco no canvas do crop + `bg-white` no AvatarImage, `pt-5` de respiro do botão. Gate verde.
 - 2026-07-13 — task-02 ⏸️ aguardando smoke visual humano (Playwright/perfil exige login). NÃO bloqueia demais tasks — seguindo para task-03.
+- 2026-07-13 — task-03 ✅ colunas specialty/role/location/skills aplicadas no banco (Management API, status 201, verificadas) + form estendido (especialidade ToggleChips, cargo/local inputs, skills chips) + validação server-side. Gate verde.

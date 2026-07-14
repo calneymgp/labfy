@@ -19,7 +19,9 @@ export default async function PerfilPage() {
 
   const { data } = await supabase
     .from("profiles")
-    .select("id, full_name, headline, avatar_url, preferred_models, preferred_harnesses")
+    .select(
+      "id, full_name, headline, avatar_url, preferred_models, preferred_harnesses, specialty, role, location, skills"
+    )
     .eq("id", user.id)
     .maybeSingle();
 
@@ -30,6 +32,10 @@ export default async function PerfilPage() {
     avatar_url: null,
     preferred_models: [],
     preferred_harnesses: [],
+    specialty: "",
+    role: "",
+    location: "",
+    skills: [],
   };
 
   return (

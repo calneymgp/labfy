@@ -5,6 +5,10 @@ export type Profile = {
   avatar_url: string | null;
   preferred_models: string[];
   preferred_harnesses: string[];
+  specialty: string;
+  role: string;
+  location: string;
+  skills: string[];
 };
 
 export const MODEL_OPTIONS = [
@@ -26,8 +30,25 @@ export const HARNESS_OPTIONS = [
   "Grok CLI",
 ] as const;
 
+export const SPECIALTY_OPTIONS = [
+  "Frontend",
+  "Backend",
+  "Fullstack",
+  "Data/ML",
+  "DevOps",
+  "Security",
+  "Design",
+  "Produto",
+  "Mobile",
+  "Outro",
+] as const;
+
 export const FULL_NAME_MAX = 80;
 export const HEADLINE_MAX = 120;
+export const ROLE_MAX = 60;
+export const LOCATION_MAX = 60;
+export const SKILL_MAX = 24;
+export const SKILLS_MAX_COUNT = 20;
 
 export function initialsOf(name: string, fallback: string): string {
   const source = name.trim() || fallback;

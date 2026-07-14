@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,11 @@ import {
   HEADLINE_MAX,
   HARNESS_OPTIONS,
   MODEL_OPTIONS,
+  SPECIALTY_OPTIONS,
+  ROLE_MAX,
+  LOCATION_MAX,
+  SKILL_MAX,
+  SKILLS_MAX_COUNT,
   type Profile,
 } from "@/lib/profile";
 import { updateProfile } from "./actions";
@@ -55,6 +60,11 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   const [headline, setHeadline] = React.useState(profile.headline);
   const [models, setModels] = React.useState<string[]>(profile.preferred_models);
   const [harnesses, setHarnesses] = React.useState<string[]>(profile.preferred_harnesses);
+  const [specialty, setSpecialty] = React.useState(profile.specialty);
+  const [role, setRole] = React.useState(profile.role);
+  const [location, setLocation] = React.useState(profile.location);
+  const [skills, setSkills] = React.useState<string[]>(profile.skills);
+  const [skillDraft, setSkillDraft] = React.useState("");
   const [saving, setSaving] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -62,6 +72,19 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   function toggle(list: string[], setList: (v: string[]) => void, value: string) {
     setSaved(false);
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+
+  function addSkill(raw: string) {
+    const value = raw.trim().slice(0, SKILL_MAX);
+    if (!value || skills.includes(value) || skills.length >= SKILLS_MAX_COUNT) return;
+    setSaved(false);
+    setSkills([...skills, value]);
+    setSkillDraft("");
+  }
+
+  function removeSkill(value: string) {
+    setSaved(false);
+    setSkills(skills.filter((s) => s !== value));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -76,6 +99,10 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         headline,
         preferredModels: models,
         preferredHarnesses: harnesses,
+        specialty,
+        role,
+        location,
+        skills,
       });
       if (saveError) return setError(saveError);
 
@@ -125,6 +152,89 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <p className="text-[10px] text-muted-foreground">
           {headline.length}/{HEADLINE_MAX}
         </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+          Especialidade
+        </p>
+        <ToggleChips
+          options={SPECIALTY_OPTIONS}
+          selected={specialty ? [specialty] : []}
+          onToggle={(v) => {
+            setSaved(false);
+            setSpecialty((cur) => (cur === v ? "" : v));
+          }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="role" className="text-xs">
+            Cargo
+          </Label>
+          <Input
+            id="role"
+            value={role}
+            maxLength={ROLE_MAX}
+            onChange={(e) => {
+              setSaved(false);
+              setRole(e.target.value);
+            }}
+            placeholder="Ex.: Engenheiro de software"
+            className="rounded-sm"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="location" className="text-xs">
+            Localização
+          </Label>
+          <Input
+            id="location"
+            value={location}
+            maxLength={LOCATION_MAX}
+            onChange={(e) => {
+              setSaved(false);
+              setLocation(e.target.value);
+            }}
+            placeholder="Ex.: Curitiba, BR"
+            className="rounded-sm"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="skills" className="text-xs">
+          Skills
+        </Label>
+        <Input
+          id="skills"
+          value={skillDraft}
+          onChange={(e) => setSkillDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === ",") {
+              e.preventDefault();
+              addSkill(skillDraft);
+            }
+          }}
+          placeholder="Digite uma skill e tecle Enter"
+          className="rounded-sm"
+        />
+        {skills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {skills.map((skill) => (
+              <button
+                key={skill}
+                type="button"
+                onClick={() => removeSkill(skill)}
+                className="inline-flex items-center gap-1 rounded-sm border border-border bg-card px-2 py-1 font-mono text-[11px] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+              >
+                {skill}
+                <X className="size-3" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-1.5">
