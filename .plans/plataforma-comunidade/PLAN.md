@@ -201,9 +201,9 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. 3-4 gráficos raio-X com recharts (ex: Pie de especialidade, Pie/Bar de harnesses, Bar de localização) usando cores de token.
   4. Layout responsivo: cards empilham no mobile; charts em grid que colapsa.
 - **acceptance:**
-  - [ ] `community-stats.tsx` importa de `@/components/ui/chart` (grep)
-  - [ ] há ao menos 1 `PieChart` e 1 `BarChart` (grep no arquivo)
-  - [ ] `membros/page.tsx` computa contagem por `preferred_harnesses` (grep `preferred_harnesses`)
+  - [x] `community-stats.tsx` importa de `@/components/ui/chart` (grep)
+  - [x] há ao menos 1 `PieChart` e 1 `BarChart` (grep no arquivo)
+  - [x] `membros/page.tsx` computa contagem por `preferred_harnesses` (grep `preferred_harnesses`)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 > 🔄 bom ponto de /clear — o plano carrega o resto
@@ -550,3 +550,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-03 ✅ colunas specialty/role/location/skills aplicadas no banco (Management API, status 201, verificadas) + form estendido (especialidade ToggleChips, cargo/local inputs, skills chips) + validação server-side. Gate verde.
 - 2026-07-13 — task-04 ✅ view public_profiles criada (201, colunas verificadas SEM email/phone, vazamento=0) + sidebar Comunidade→Membros + /membros com diretório filtrável (nome/especialidade/cargo/localização) + /comunidade redireciona. Gate verde.
 - 2026-07-13 — backlog: adicionado épico War Room (task-11 a task-15) ao fim do plano. Decisões travadas: Trigger.dev v4.5.0 (durável/realtime/resume nativo), PixelLab para sprites (creds em loot-hunter/.env.local), fluxo research→debate→conclusion, persistência Supabase. Execução continua na ordem — War Room só após task-10.
+- 2026-07-13 — task-05 ✅ dashboard raio-X em /membros: 4 cards macro (total, Claude Code, GPT, especialidades) + Pie por especialidade + Bars por harness e localização (recharts). Agregados computados no server component. Gate verde.
