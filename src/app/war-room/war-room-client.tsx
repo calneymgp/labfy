@@ -26,6 +26,7 @@ export function WarRoomClient({
   const [sessionId, setSessionId] = React.useState<string | null>(initialSessionId);
   const [messages, setMessages] = React.useState<WarRoomMessage[]>(initialMessages);
   const [starting, setStarting] = React.useState(false);
+  const [started, setStarted] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const bottomRef = React.useRef<HTMLDivElement>(null);
 
@@ -86,6 +87,7 @@ export function WarRoomClient({
         setPrompt("");
         setMessages([]);
         setSessionId(sid);
+        setStarted(true);
       }
     } catch {
       setError("Algo deu errado. Tente novamente.");
@@ -97,21 +99,24 @@ export function WarRoomClient({
   const spoken = messages.filter((m) => m.phase === "debate" || m.phase === "research");
   const conclusion = messages.find((m) => m.phase === "conclusion");
 
-  const running = !conclusion && (spoken.length > 0 || Boolean(sessionId));
+  const activeStatus = initialStatus === "researching" || initialStatus === "debating";
   const phaseLabel = conclusion
     ? "Concluído"
-    : initialStatus === "error" && spoken.length === 0
-      ? "Falhou — tente de novo"
+    : spoken.some((m) => m.phase === "debate")
+      ? "Debatendo…"
       : spoken.length > 0
-        ? "Debatendo…"
-        : sessionId
+        ? "Pesquisando…"
+        : started || activeStatus
           ? "Pesquisando…"
-          : null;
+          : initialStatus === "error"
+            ? "Falhou — tente de novo"
+            : null;
+  const running = phaseLabel === "Pesquisando…" || phaseLabel === "Debatendo…";
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-2xl flex-col">
+    <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col">
       {/* Área rolável: cena + falas */}
-      <div className="flex-1 space-y-4 overflow-y-auto px-1 pb-4">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 pb-4">
         <WarRoomScene />
 
         {phaseLabel && (

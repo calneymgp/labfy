@@ -40,12 +40,17 @@ export default async function WarRoomPage() {
     messages = (data ?? []) as WarRoomMessage[];
   }
 
+  // Só reidrata a última sessão se tiver conteúdo ou estiver ativa — evita
+  // reabrir com um debate vazio e um falso "Pesquisando…".
+  const active = status === "researching" || status === "debating";
+  const reidratar = messages.length > 0 || active;
+
   return (
-    <section className="flex h-[calc(100dvh-2rem)] w-full flex-col px-4 py-3">
+    <section className="flex min-h-0 flex-1 flex-col px-4 py-3">
       <WarRoomClient
-        initialSessionId={sessionId}
-        initialMessages={messages}
-        initialStatus={status}
+        initialSessionId={reidratar ? sessionId : null}
+        initialMessages={reidratar ? messages : []}
+        initialStatus={reidratar ? status : null}
       />
     </section>
   );
