@@ -58,6 +58,11 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 - **Editor Markdown:** ver `## Discovery`. Render público via `react-markdown` + `remark-gfm`.
 - **Grafo genérico:** extrair `<ForceGraph nodes edges tags/>` parametrizando o que hoje é hardcoded em `buildInitialGraph`; o motor `use-force-layout.ts` já é agnóstico de domínio.
 - **Navegação:** item "Comunidade (soon)" vira **"Membros"** (`/membros`). Novos em "Principal": **Prompts** (`/prompts`), **Apps** (`/apps`). Novo grupo **"Pessoal"** com **Meu Perfil** (`/perfil`). Cadastro de apps mora dentro de `/perfil` (seção "Meus Apps"); `/apps` é a visão pública.
+- **War Room persistência + web search (DRIFT task-13)** — (1) dentro da task Trigger.dev uso
+  `supabase-js` com **service_role key** (stateless, bypassa RLS) em vez de `pg.Pool` — o Supabase
+  aqui é cloud, não self-hosted, e não há DATABASE_URL/senha do Postgres. (2) Web search via
+  **OpenRouter `:online`** (nativo, Exa por baixo) em vez de tool opencrawl — sem endpoint/infra
+  própria, mais simples e sustentável. Novas envs: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
 - **Grafo genérico (DRIFT task-10)** — em vez de refatorar `mindmap-graph.tsx` (risco de regressão visual que o typecheck não pega), criei um `ForceGraph` genérico **novo** (`src/app/components/force-graph.tsx`) que reusa o **motor compartilhado** (`use-force-layout`, `floating-edge`, `geometry`). O MindMap fica intocado. Reuso real está no motor — que já era agnóstico de domínio. Menos risco, mesmo ganho.
 - **Editor de prompts (DRIFT task-07)** — descartado `@uiw/react-md-editor` (recomendação original da Discovery) em favor de um **split-view próprio** (textarea mono + preview `react-markdown`). Motivo: o `@uiw` traz toolbar/CSS estilo GitHub que destoa do design Terminal Paper (mono, minimalista); o split-view é mais leve, sem CSS externo e coerente com o projeto. `react-markdown` + `remark-gfm` cobrem escrita e leitura.
 
@@ -451,9 +456,9 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
   2. Tool `webSearch` (opencrawl) exposta ao AI SDK; agentes diversificam fontes.
   3. Task Trigger.dev: fase RESEARCH (4 agentes em paralelo, cada um pesquisa) → DEBATE (10-12 turnos rotativos, contexto compartilhado) → CONCLUSION. Cada fala é persistida em `war_room_messages` e emitida no stream da Session.
 - **acceptance:**
-  - [ ] `characters.ts` define os 4 personagens (grep `deepseek|gemma|hermes|minimax`, case-insensitive)
-  - [ ] `war-room-debate.ts` grava em `war_room_messages` e cobre as 3 fases (grep `research|debate|conclusion`)
-  - [ ] `web-search.ts` exporta uma tool de busca (grep)
+  - [x] `characters.ts` define os 4 personagens (grep `deepseek|gemma|hermes|minimax`, case-insensitive)
+  - [x] `war-room-debate.ts` grava em `war_room_messages` e cobre as 3 fases (grep `research|debate|conclusion`)
+  - [x] `web-search.ts` exporta função de busca (`withWebSearch`) — DRIFT: web search via OpenRouter `:online` em vez de tool opencrawl (ver Decisions)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-14: War Room — frontend realtime + input
@@ -564,3 +569,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — ▶️ DESBLOQUEADO. Usuário forneceu Trigger.dev self-hosted (trigger.calney.com, projeto proj_ftdcvsxpsgyywqdnzxlc) + OpenRouter. Slugs travados/validados (HTTP 200): deepseek/deepseek-v4-pro, google/gemma-4-31b-it, nousresearch/hermes-4-405b, minimax/minimax-m3. Secrets em .env.local (gitignored). Retomando execução da task-11.
 - 2026-07-14 — task-11 ✅ fundação War Room: @trigger.dev/sdk 4.5.3 + react-hooks + trigger.config.ts (self-hosted) + migration war_room_sessions/messages (201, RLS dono) + characters.ts (4 personas + slugs OpenRouter) + sidebar item War Room + rota /war-room esqueleto. Gate verde. Loop reativado (cron e5b85637).
 - 2026-07-14 — task-12 ✅ 5 sprites pixel art gerados via PixelLab (salão + DeepSeek/Gemma/Hermes/MiniMax) em public/war-room/ + script gen-war-room-pixels.mjs (one-time) + scene.tsx (composição estática, 4 assentos ao redor da mesa, highlight do personagem ativo). Gate verde.
+- 2026-07-14 — task-13 ✅ task Trigger.dev war-room-debate: research (4 agentes :online paralelo) → debate (12 turnos rotativos, contexto compartilhado) → conclusion; persiste cada fala em war_room_messages via supabase-js service_role. AI SDK 7 + OpenRouter provider. DRIFT: service_role + :online (ver Decisions). Gate verde.
