@@ -407,10 +407,10 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
   3. Sidebar: item "War Room" → `/war-room`.
   4. `/war-room`: página esqueleto (cena virá na task-12).
 - **acceptance:**
-  - [ ] `package.json` inclui `@trigger.dev/sdk` (grep)
-  - [ ] `trigger.config.ts` existe
-  - [ ] Migration cria `war_room_sessions` e `war_room_messages` com `owner_id` + RLS (grep)
-  - [ ] `sidebar.tsx` contém href `/war-room` (grep)
+  - [x] `package.json` inclui `@trigger.dev/sdk` (grep) — v4.5.3
+  - [x] `trigger.config.ts` existe (self-hosted, projeto proj_ftdcvsxpsgyywqdnzxlc)
+  - [x] Migration cria `war_room_sessions` e `war_room_messages` com `owner_id` + RLS (grep)
+  - [x] `sidebar.tsx` contém href `/war-room` (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-12: War Room — assets pixel art + cena estática
@@ -562,3 +562,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-10 ✅ ForceGraph genérico (reusa motor d3-force) + /prompts/mapa (assunto→subtópico→prompt) + /apps/mapa (categoria→app) + links "Mapa" nas duas telas. DRIFT: mindmap intocado (ver Decisions). Gate verde. ÉPICO PRINCIPAL (task-01..10) FECHADO — restam só War Room (11-15) + smoke visuais humanos (02, mindmap).
 - 2026-07-13 — ⏸️ LOOP PAUSADO (cron 71067343 encerrado). War Room (task-11..15) bloqueada por dependências que exigem input humano: (1) conta Trigger.dev + TRIGGER_SECRET_KEY no ambiente/Coolify (não tenho); (2) /dev-brainstorm para travar endpoints/modelos reais dos 4 personagens. Retomar: prover o secret + brainstorm, então reativar /loop ou rodar /dev-coding a partir da task-11.
 - 2026-07-13 — ▶️ DESBLOQUEADO. Usuário forneceu Trigger.dev self-hosted (trigger.calney.com, projeto proj_ftdcvsxpsgyywqdnzxlc) + OpenRouter. Slugs travados/validados (HTTP 200): deepseek/deepseek-v4-pro, google/gemma-4-31b-it, nousresearch/hermes-4-405b, minimax/minimax-m3. Secrets em .env.local (gitignored). Retomando execução da task-11.
+- 2026-07-14 — task-11 ✅ fundação War Room: @trigger.dev/sdk 4.5.3 + react-hooks + trigger.config.ts (self-hosted) + migration war_room_sessions/messages (201, RLS dono) + characters.ts (4 personas + slugs OpenRouter) + sidebar item War Room + rota /war-room esqueleto. Gate verde. Loop reativado (cron e5b85637).
