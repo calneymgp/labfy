@@ -357,17 +357,19 @@ Feature: uma "sala de guerra" pixelada onde 4 personagens-LLM debatem um prompt 
 em tempo real até uma conclusão. É a maior feature do backlog — ao chegar na task-11, vale
 um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** antes de codar.
 
-**Personagens** (persona visual → modelo; o modelo exato é resolvido na execução conforme
-disponibilidade via Vercel AI SDK providers / vLLM do calneyserver — se um modelo específico
-não estiver acessível, mapear para o mais próximo e registrar no drift log):
-- **DeepSeek** — sábio chinês · modelo família DeepSeek (ex: "DeepSeek V4 Pro")
-- **Gemma** — moderno/americano · modelo família Gemma (ex: "Gemma 4 31B")
-- **Hermes** — Hermes, filho de Zeus (deus grego) · modelo família Hermes/Nous (ex: "Hermes 405B")
-- **MiniMax** — europeu · modelo família MiniMax (ex: "MiniMax M3")
+**Personagens** (persona visual → modelo OpenRouter — slugs TRAVADOS e validados em 2026-07-13):
+- **DeepSeek** — sábio chinês · `deepseek/deepseek-v4-pro`
+- **Gemma** — moderno/americano · `google/gemma-4-31b-it`
+- **Hermes** — Hermes, filho de Zeus (deus grego) · `nousresearch/hermes-4-405b`
+- **MiniMax** — europeu · `minimax/minimax-m3`
 
 **Decisões-chave** (ver `## Discovery`):
 - **Orquestração:** Trigger.dev v4.5.0 (`chat.agent`/Session durável + realtime). Resume ao
   reabrir o navegador e realtime saem de graça da plataforma — requisito duro atendido nativamente.
+- **Infra (fornecida pelo usuário):** Trigger.dev **self-hosted** em `trigger.calney.com`
+  (`TRIGGER_API_URL`), projeto `proj_ftdcvsxpsgyywqdnzxlc`. **Provider LLM = OpenRouter** (único,
+  todos os 4 modelos). Secrets em `.env.local` (`TRIGGER_SECRET_KEY`, `TRIGGER_API_URL`,
+  `TRIGGER_PROJECT_ID`, `OPENROUTER_API_KEY`) → **replicar no Coolify** antes do deploy.
 - **Fluxo:** (1) usuário envia prompt → (2) fase RESEARCH: 4 agentes fazem web search em
   paralelo com ângulos/fontes **diversificados** → (3) fase DEBATE: 10-12 turnos rotativos,
   contexto compartilhado (todos veem tudo), streaming → (4) fase CONCLUSION: síntese final.
@@ -559,3 +561,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-09 ✅ galeria pública /apps (sidebar item Apps) + cards responsivos com autor via public_profiles + chart Bar por categoria + filtro por categoria. Gate verde. Bloco de Apps fechado.
 - 2026-07-13 — task-10 ✅ ForceGraph genérico (reusa motor d3-force) + /prompts/mapa (assunto→subtópico→prompt) + /apps/mapa (categoria→app) + links "Mapa" nas duas telas. DRIFT: mindmap intocado (ver Decisions). Gate verde. ÉPICO PRINCIPAL (task-01..10) FECHADO — restam só War Room (11-15) + smoke visuais humanos (02, mindmap).
 - 2026-07-13 — ⏸️ LOOP PAUSADO (cron 71067343 encerrado). War Room (task-11..15) bloqueada por dependências que exigem input humano: (1) conta Trigger.dev + TRIGGER_SECRET_KEY no ambiente/Coolify (não tenho); (2) /dev-brainstorm para travar endpoints/modelos reais dos 4 personagens. Retomar: prover o secret + brainstorm, então reativar /loop ou rodar /dev-coding a partir da task-11.
+- 2026-07-13 — ▶️ DESBLOQUEADO. Usuário forneceu Trigger.dev self-hosted (trigger.calney.com, projeto proj_ftdcvsxpsgyywqdnzxlc) + OpenRouter. Slugs travados/validados (HTTP 200): deepseek/deepseek-v4-pro, google/gemma-4-31b-it, nousresearch/hermes-4-405b, minimax/minimax-m3. Secrets em .env.local (gitignored). Retomando execução da task-11.
