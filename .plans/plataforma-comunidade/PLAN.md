@@ -1,6 +1,6 @@
 ---
 feature: plataforma-comunidade
-status: code-complete
+status: done
 created: 2026-07-13
 brief: (origem: pedido falado do usuário, sintetizado pelo Tech Lead)
 ---
@@ -624,4 +624,5 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-14 — task-16 ✅ (extra) WhatsApp no perfil: PhoneInput com bandeiras + código de país (defaultCountry BR), validação libphonenumber-js, coluna whatsapp (aditiva). NÃO exposto na view pública (LGPD confirmado no banco). Gate verde.
 - 2026-07-14 — 🔴 deploy da War Room BLOQUEADO (devops confirmou no Postgres do Trigger): `proj_ftdcvsxpsgyywqdnzxlc` é o projeto de PRODUÇÃO do TAMZ, não existe projeto "labfydev". Comando de deploy correto: `rtk proxy npx --yes trigger.dev@4.5.3 deploy --api-url "$TRIGGER_API_URL"` (SEM --local-build/--self-hosted; --local-build liga registry ECR-cloud inexistente no self-hosted). DECISÃO do usuário: criar projeto labfydev novo na UI. Aguardando novo proj_ref + secret key (tr_prod_) para atualizar trigger.config.ts + .env.local e deployar isolado + configurar env vars de runtime (OPENROUTER_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY).
 - 2026-07-14 — task-17 ✅ (extra) War Room usa a ARTE do usuário: vídeo otimizado (2,3M→116KB via ffmpeg-static) como `<video>` leve + poster; removidos os 5 sprites gerados + script. Conclusão GARANTIDA (~100%): loop de fallback entre os 4 modelos + fallback textual; turnos finais orientados a convergir. Gate verde.
-- 2026-07-14 — 🏁 CÓDIGO DO ÉPICO COMPLETO (task-01..17, 17/17). Pendências que exigem HUMANO: (a) smoke visual Perfil (task-02) e MindMap; (b) `npx trigger.dev deploy` (precisa TRIGGER access token, não o secret) para publicar a task no trigger.calney.com; (c) replicar as 6 secrets do .env.local no Coolify. Sem (b)+(c) a War Room cria a sessão mas o debate não roda. Loop encerrado.
+- 2026-07-14 — 🏁 CÓDIGO DO ÉPICO COMPLETO (task-01..17, 17/17).
+- 2026-07-14 — 🚀 WAR ROOM NO AR: projeto labfydev criado (proj_mjiflhfpfsmescrpmqsn); deploy OK (v20260714.2); env vars de runtime setadas via API; acesso restrito a calneymgp@gmail.com. FIX: task escreve via PostgREST (supabase-js exige WebSocket, indisponível no runtime). TESTE E2E PASSOU: research paralelo (4 personas web search) → 12 turnos de debate → conclusão acionável (status=concluded, 17 falas). ÉPICO FECHADO DE VERDADE. ✅ Pendências que exigem HUMANO: (a) smoke visual Perfil (task-02) e MindMap; (b) `npx trigger.dev deploy` (precisa TRIGGER access token, não o secret) para publicar a task no trigger.calney.com; (c) replicar as 6 secrets do .env.local no Coolify. Sem (b)+(c) a War Room cria a sessão mas o debate não roda. Loop encerrado.
