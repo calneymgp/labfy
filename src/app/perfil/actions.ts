@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { createClient } from "@/lib/supabase/server";
 import {
   FULL_NAME_MAX,
@@ -23,6 +24,7 @@ export async function updateProfile(input: {
   role: string;
   location: string;
   skills: string[];
+  whatsapp: string;
 }): Promise<{ error?: string }> {
   const supabase = await createClient();
   const {
@@ -57,6 +59,11 @@ export async function updateProfile(input: {
     new Set(input.skills.map((s) => s.trim().slice(0, SKILL_MAX)).filter(Boolean))
   ).slice(0, SKILLS_MAX_COUNT);
 
+  const whatsapp = input.whatsapp.trim();
+  if (whatsapp && !isValidPhoneNumber(whatsapp)) {
+    return { error: "Número de WhatsApp inválido." };
+  }
+
   // a linha do perfil é criada pelo trigger on_auth_user_created no signup
   const { error } = await supabase
     .from("profiles")
@@ -69,6 +76,7 @@ export async function updateProfile(input: {
       role,
       location,
       skills,
+      whatsapp,
     })
     .eq("id", user.id);
 

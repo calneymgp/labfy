@@ -22,7 +22,7 @@ export default async function PerfilPage() {
   const { data } = await supabase
     .from("profiles")
     .select(
-      "id, full_name, headline, avatar_url, preferred_models, preferred_harnesses, specialty, role, location, skills"
+      "id, full_name, headline, avatar_url, preferred_models, preferred_harnesses, specialty, role, location, skills, whatsapp"
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -38,6 +38,7 @@ export default async function PerfilPage() {
     role: "",
     location: "",
     skills: [],
+    whatsapp: "",
   };
 
   const { data: appsData } = await supabase

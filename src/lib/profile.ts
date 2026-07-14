@@ -9,6 +9,7 @@ export type Profile = {
   role: string;
   location: string;
   skills: string[];
+  whatsapp: string;
 };
 
 // Projeção pública (view public_profiles) — nunca inclui email/phone.

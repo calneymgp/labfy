@@ -18,6 +18,8 @@ import {
   SKILLS_MAX_COUNT,
   type Profile,
 } from "@/lib/profile";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { updateProfile } from "./actions";
 
 function ToggleChips({
@@ -63,6 +65,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
   const [specialty, setSpecialty] = React.useState(profile.specialty);
   const [role, setRole] = React.useState(profile.role);
   const [location, setLocation] = React.useState(profile.location);
+  const [whatsapp, setWhatsapp] = React.useState(profile.whatsapp);
   const [skills, setSkills] = React.useState<string[]>(profile.skills);
   const [skillDraft, setSkillDraft] = React.useState("");
   const [saving, setSaving] = React.useState(false);
@@ -103,6 +106,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         role,
         location,
         skills,
+        whatsapp,
       });
       if (saveError) return setError(saveError);
 
@@ -201,6 +205,29 @@ export function ProfileForm({ profile }: { profile: Profile }) {
             className="rounded-sm"
           />
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="whatsapp-field" className="text-xs">
+          WhatsApp
+        </Label>
+        <PhoneInput
+          international
+          defaultCountry="BR"
+          value={whatsapp || undefined}
+          onChange={(v) => {
+            setSaved(false);
+            setWhatsapp(v ?? "");
+          }}
+          className="labfy-phone flex items-center gap-2 rounded-sm border border-input bg-card px-2"
+          numberInputProps={{
+            id: "whatsapp-field",
+            className: "h-9 w-full bg-transparent font-mono text-sm outline-none",
+          }}
+        />
+        <p className="text-[10px] text-muted-foreground">
+          Visível só para você — não aparece no diretório público.
+        </p>
       </div>
 
       <div className="space-y-1.5">

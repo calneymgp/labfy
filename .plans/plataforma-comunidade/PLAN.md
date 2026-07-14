@@ -508,6 +508,38 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
 
 ---
 
+## Tasks — Extras (pós-plano)
+
+### task-16: WhatsApp no perfil (country code + bandeiras)
+
+- **type:** `auto`
+- **effort:** `S`
+- **slice:** vertical (toca: schema → form → action → page)
+- **depends_on:** []
+- **rollback:** `alter table public.profiles drop column whatsapp;`
+- **read_first:**
+  - `src/app/perfil/profile-form.tsx` — onde encaixar o campo.
+  - `package.json` — `react-phone-number-input` e `libphonenumber-js` já instalados.
+- **files_modified:**
+  - `supabase/migrations/<ts>_profile_whatsapp.sql` (new)
+  - `src/lib/profile.ts` (modify — `whatsapp` no tipo)
+  - `src/app/perfil/profile-form.tsx` (modify — `<PhoneInput>` com bandeiras, defaultCountry BR)
+  - `src/app/perfil/actions.ts` (modify — validar com libphonenumber-js + persistir)
+  - `src/app/perfil/page.tsx` (modify — incluir `whatsapp` no select + fallback)
+- **action:**
+  1. Migration aditiva: `whatsapp text not null default ''` em profiles.
+  2. Campo com `react-phone-number-input` (seletor de país com **bandeiras**, `defaultCountry="BR"`, `international`), valor E.164.
+  3. Server action valida com `isValidPhoneNumber` (vazio permitido) e persiste.
+  4. **NÃO** adicionar `whatsapp` à view `public_profiles` (contato sensível — LGPD).
+- **acceptance:**
+  - [x] Migration cria coluna `whatsapp` (grep) — aplicada, coluna confirmada
+  - [x] `profile-form.tsx` usa `react-phone-number-input` (grep) — PhoneInput com bandeiras, defaultCountry BR
+  - [x] `actions.ts` valida (`isValidPhoneNumber`) e grava `whatsapp` (grep)
+  - [x] `whatsapp` NÃO está na view `public_profiles` (verificado no banco: vazio)
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
+---
+
 ## Must-Haves (goal-backward verification)
 
 ### Truths (observable behaviors)
@@ -576,4 +608,5 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-14 — task-13 ✅ task Trigger.dev war-room-debate: research (4 agentes :online paralelo) → debate (12 turnos rotativos, contexto compartilhado) → conclusion; persiste cada fala em war_room_messages via supabase-js service_role. AI SDK 7 + OpenRouter provider. DRIFT: service_role + :online (ver Decisions). Gate verde.
 - 2026-07-14 — task-14 ✅ frontend /war-room: input dispara startDebate (cria sessão + tasks.trigger + external_id); war-room-client streama via Supabase Realtime (postgres_changes), cena com highlight de quem fala, painel de falas por personagem, conclusão destacada; page reidrata a sessão mais recente. Realtime habilitado na publication (201). DRIFT: Supabase Realtime (ver Decisions). Gate verde.
 - 2026-07-14 — task-15 ✅ resumibilidade+robustez: re-sync no reconnect (SUBSCRIBED) + dedup por id; indicador de fase (pesquisando/debatendo/concluído); idempotência (delete no início da task); resiliência (allSettled na research, try/catch por turno — falha de 1 modelo não derruba o debate). Gate verde.
+- 2026-07-14 — task-16 ✅ (extra) WhatsApp no perfil: PhoneInput com bandeiras + código de país (defaultCountry BR), validação libphonenumber-js, coluna whatsapp (aditiva). NÃO exposto na view pública (LGPD confirmado no banco). Gate verde.
 - 2026-07-14 — 🏁 CÓDIGO DO ÉPICO COMPLETO (task-01..15, 15/15). Pendências que exigem HUMANO: (a) smoke visual Perfil (task-02) e MindMap; (b) `npx trigger.dev deploy` (precisa TRIGGER access token, não o secret) para publicar a task no trigger.calney.com; (c) replicar as 6 secrets do .env.local no Coolify. Sem (b)+(c) a War Room cria a sessão mas o debate não roda. Loop encerrado.
