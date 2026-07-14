@@ -34,6 +34,11 @@ async function getCroppedBlob(src: string, area: Area): Promise<Blob> {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas indisponível neste navegador.");
 
+  // WebP não preserva transparência — sem este fundo, PNG transparente
+  // seria exportado com fundo preto.
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
   ctx.drawImage(
     image,
     area.x,
@@ -134,10 +139,10 @@ export function AvatarUpload({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="group/upload relative -mt-8 shrink-0 rounded-full ring-4 ring-card"
+        className="group/upload relative -mt-12 shrink-0 rounded-full ring-4 ring-card"
         aria-label="Trocar foto de perfil"
       >
-        <Avatar size="lg" className="size-20">
+        <Avatar size="lg" className="size-28">
           {avatarUrl && <AvatarImage src={avatarUrl} alt="Foto de perfil" />}
           <AvatarFallback className="text-lg">{initials}</AvatarFallback>
         </Avatar>

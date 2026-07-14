@@ -105,10 +105,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. Adicionar `bg-white` no `AvatarImage` (ou no root do `Avatar`) como fallback de exibição para imagens já transparentes.
   4. Dar respiro ao botão: `pt-*` no bloco `px-6 pb-6` de `page.tsx:45` e/ou `mt-*` no wrapper do botão — o botão não pode encostar na capa preta.
 - **acceptance:**
-  - [ ] `avatar-upload.tsx` não contém mais `size-20` para o avatar (grep `size-20` retorna vazio nesse arquivo)
-  - [ ] `getCroppedBlob` contém `fillRect` (grep `fillRect` em `avatar-upload.tsx`)
-  - [ ] `avatar.tsx` `AvatarImage` contém `bg-white` (grep)
-  - [ ] `page.tsx` bloco pós-capa tem classe `pt-` (grep `pt-` no bloco de conteúdo)
+  - [x] `avatar-upload.tsx` não contém mais `size-20` para o avatar (grep `size-20` retorna vazio nesse arquivo)
+  - [x] `getCroppedBlob` contém `fillRect` (grep `fillRect` em `avatar-upload.tsx`)
+  - [x] `avatar.tsx` `AvatarImage` contém `bg-white` (grep)
+  - [x] `page.tsx` bloco pós-capa tem classe `pt-` (grep `pt-` no bloco de conteúdo)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-02: visual smoke do Perfil (Playwright)
@@ -390,3 +390,6 @@ Para retomar do zero em uma nova sessão:
 ## Status Log
 
 Atualizado por `/dev-coding` durante execução. Não preencher antes.
+
+- 2026-07-13 — task-01 ✅ avatar `size-28`, fundo branco no canvas do crop + `bg-white` no AvatarImage, `pt-5` de respiro do botão. Gate verde.
+- 2026-07-13 — task-02 ⏸️ aguardando smoke visual humano (Playwright/perfil exige login). NÃO bloqueia demais tasks — seguindo para task-03.

@@ -42,7 +42,7 @@ export default async function PerfilPage() {
           </p>
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 pt-5">
           <AvatarUpload
             userId={user.id}
             avatarUrl={profile.avatar_url}
