@@ -45,6 +45,10 @@ const mainNav: NavItem[] = [
   { title: "Design System", href: "/design-system", icon: Palette },
 ];
 
+const personalNav: NavItem[] = [
+  { title: "Meu Perfil", href: "/perfil", icon: UserRound },
+];
+
 export type SidebarUser = {
   email: string;
   name: string | null;
@@ -108,6 +112,30 @@ export function V6Sidebar({ user }: { user: SidebarUser }) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {user && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-[0.65rem] uppercase tracking-wider">
+              Pessoal
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {personalNav.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      isActive={pathname === item.href}
+                      tooltip={item.title}
+                      render={<Link href={item.href} />}
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter>

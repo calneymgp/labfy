@@ -289,10 +289,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. Seção "Meus Apps" em `/perfil`: listar apps do usuário + form de add/editar/remover (nome, descrição, categoria, URL).
   4. Server actions CRUD restritas ao dono.
 - **acceptance:**
-  - [ ] Migration cria tabela `apps` com `owner_id`, `category`, `url` (grep)
-  - [ ] `.sql` tem SELECT público + `with check (auth.uid() = owner_id)` (grep)
-  - [ ] `sidebar.tsx` tem 2 `SidebarGroupLabel` (grep — "Principal" e "Pessoal")
-  - [ ] `my-apps.tsx` faz create e delete via action (grep)
+  - [x] Migration cria tabela `apps` com `owner_id`, `category`, `url` (grep)
+  - [x] `.sql` tem SELECT público + `with check (auth.uid() = owner_id)` (grep)
+  - [x] `sidebar.tsx` tem 2 `SidebarGroupLabel` (grep — "Principal" e "Pessoal")
+  - [x] `my-apps.tsx` faz create e delete via action (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-09: Apps — galeria pública `/apps` + gráfico por categoria
@@ -554,3 +554,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-05 ✅ dashboard raio-X em /membros: 4 cards macro (total, Claude Code, GPT, especialidades) + Pie por especialidade + Bars por harness e localização (recharts). Agregados computados no server component. Gate verde.
 - 2026-07-13 — task-06 ✅ tabela prompts (201, RLS: select público + insert/update/delete do dono) + sidebar item Prompts + /prompts (lista + busca client-side por título/tópico/tag/corpo; autor via public_profiles em 2ª query). Gate verde.
 - 2026-07-13 — task-07 ✅ editor de prompts split-view (Escrever/Preview) + /prompts/novo (bloqueia deslogado) + createPrompt (sempre público, owner_id do user) + /prompts/[id] render react-markdown. DRIFT: @uiw descartado por consistência de design (ver Decisions), fallback react-markdown. Gate verde.
+- 2026-07-13 — task-08 ✅ tabela apps (201, RLS: select público + escrita do dono) + grupo "Pessoal" no sidebar (Meu Perfil, só logado) + seção "Meus Apps" no /perfil (CRUD: nome/descrição/categoria/URL) via server actions restritas ao dono. Gate verde.

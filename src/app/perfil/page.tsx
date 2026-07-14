@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { initialsOf, type Profile } from "@/lib/profile";
+import type { App } from "@/lib/apps";
 import { AvatarUpload } from "./avatar-upload";
 import { ProfileForm } from "./profile-form";
+import { MyApps } from "./my-apps";
 
 export const metadata: Metadata = {
   title: "Perfil — Labfy",
@@ -38,6 +40,13 @@ export default async function PerfilPage() {
     skills: [],
   };
 
+  const { data: appsData } = await supabase
+    .from("apps")
+    .select("id, owner_id, name, description, category, url, created_at")
+    .eq("owner_id", user.id)
+    .order("created_at", { ascending: false });
+  const apps = (appsData ?? []) as App[];
+
   return (
     <section className="mx-auto w-full max-w-2xl px-4 pb-12">
       <div className="mt-6 overflow-hidden rounded-sm border border-border bg-card">
@@ -64,6 +73,13 @@ export default async function PerfilPage() {
 
           <div className="mt-6 border-t border-border pt-6">
             <ProfileForm profile={profile} />
+          </div>
+
+          <div className="mt-6 border-t border-border pt-6">
+            <p className="mb-4 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+              Meus Apps
+            </p>
+            <MyApps apps={apps} />
           </div>
         </div>
       </div>
