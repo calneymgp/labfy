@@ -2,6 +2,7 @@
 
 import { tasks } from "@trigger.dev/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { WAR_ROOM_ALLOWED_EMAILS } from "@/lib/war-room/characters";
 import type { warRoomDebate } from "@/trigger/war-room-debate";
 
 export async function startDebate(
@@ -12,6 +13,11 @@ export async function startDebate(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Você precisa estar logado." };
+  // Gate de custo: só emails liberados disparam a task (que consome tokens OpenRouter).
+  // Não confiar apenas no redirect da página — server actions são invocáveis via HTTP.
+  if (!WAR_ROOM_ALLOWED_EMAILS.includes(user.email ?? "")) {
+    return { error: "A War Room está restrita no momento." };
+  }
 
   const prompt = rawPrompt.trim().slice(0, 2000);
   if (!prompt) return { error: "Escreva um tema para o debate." };
