@@ -58,6 +58,7 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 - **Editor Markdown:** ver `## Discovery`. Render público via `react-markdown` + `remark-gfm`.
 - **Grafo genérico:** extrair `<ForceGraph nodes edges tags/>` parametrizando o que hoje é hardcoded em `buildInitialGraph`; o motor `use-force-layout.ts` já é agnóstico de domínio.
 - **Navegação:** item "Comunidade (soon)" vira **"Membros"** (`/membros`). Novos em "Principal": **Prompts** (`/prompts`), **Apps** (`/apps`). Novo grupo **"Pessoal"** com **Meu Perfil** (`/perfil`). Cadastro de apps mora dentro de `/perfil` (seção "Meus Apps"); `/apps` é a visão pública.
+- **Grafo genérico (DRIFT task-10)** — em vez de refatorar `mindmap-graph.tsx` (risco de regressão visual que o typecheck não pega), criei um `ForceGraph` genérico **novo** (`src/app/components/force-graph.tsx`) que reusa o **motor compartilhado** (`use-force-layout`, `floating-edge`, `geometry`). O MindMap fica intocado. Reuso real está no motor — que já era agnóstico de domínio. Menos risco, mesmo ganho.
 - **Editor de prompts (DRIFT task-07)** — descartado `@uiw/react-md-editor` (recomendação original da Discovery) em favor de um **split-view próprio** (textarea mono + preview `react-markdown`). Motivo: o `@uiw` traz toolbar/CSS estilo GitHub que destoa do design Terminal Paper (mono, minimalista); o split-view é mais leve, sem CSS externo e coerente com o projeto. `react-markdown` + `remark-gfm` cobrem escrita e leitura.
 
 ## Discovery
@@ -341,9 +342,9 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. Grafo de **apps**: nós = apps agrupados por `category`.
   4. (Se sobrar escopo) grafo de **membros** por `specialty` — opcional, é o menos escalável.
 - **acceptance:**
-  - [ ] `force-graph.tsx` exporta um componente que aceita `nodes` e `edges` por prop (grep — assinatura com props)
-  - [ ] `/mindmap` continua renderizando (must_pass typecheck + smoke visual)
-  - [ ] existe uma rota de mapa de prompts que constrói nós a partir de `topic`/`subtopic` (grep)
+  - [x] `force-graph.tsx` exporta um componente que aceita `nodes` e `edges` por prop (grep — assinatura com props)
+  - [x] `/mindmap` continua renderizando — DRIFT: mindmap NÃO foi refatorado (intocado, zero regressão); o reuso é do motor compartilhado `use-force-layout`/`floating-edge`
+  - [x] existe uma rota de mapa de prompts que constrói nós a partir de `topic`/`subtopic` (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 > 🔄 bom ponto de /clear — a War Room (task-11+) é um épico próprio; contexto fresco ajuda
@@ -556,3 +557,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-07 ✅ editor de prompts split-view (Escrever/Preview) + /prompts/novo (bloqueia deslogado) + createPrompt (sempre público, owner_id do user) + /prompts/[id] render react-markdown. DRIFT: @uiw descartado por consistência de design (ver Decisions), fallback react-markdown. Gate verde.
 - 2026-07-13 — task-08 ✅ tabela apps (201, RLS: select público + escrita do dono) + grupo "Pessoal" no sidebar (Meu Perfil, só logado) + seção "Meus Apps" no /perfil (CRUD: nome/descrição/categoria/URL) via server actions restritas ao dono. Gate verde.
 - 2026-07-13 — task-09 ✅ galeria pública /apps (sidebar item Apps) + cards responsivos com autor via public_profiles + chart Bar por categoria + filtro por categoria. Gate verde. Bloco de Apps fechado.
+- 2026-07-13 — task-10 ✅ ForceGraph genérico (reusa motor d3-force) + /prompts/mapa (assunto→subtópico→prompt) + /apps/mapa (categoria→app) + links "Mapa" nas duas telas. DRIFT: mindmap intocado (ver Decisions). Gate verde. ÉPICO PRINCIPAL (task-01..10) FECHADO — restam só War Room (11-15) + smoke visuais humanos (02, mindmap).

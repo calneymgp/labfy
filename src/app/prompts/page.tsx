@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Waypoints } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Prompt, PromptWithAuthor } from "@/lib/prompts";
 import { buttonVariants } from "@/components/ui/button";
@@ -48,13 +48,22 @@ export default async function PromptsPage() {
             Biblioteca pública de prompts da comunidade.
           </p>
         </div>
-        <Link
-          href="/prompts/novo"
-          className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-sm" })}
-        >
-          <Plus className="size-3.5" />
-          Criar prompt
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/prompts/mapa"
+            className={buttonVariants({ variant: "ghost", size: "sm", className: "rounded-sm" })}
+          >
+            <Waypoints className="size-3.5" />
+            Mapa
+          </Link>
+          <Link
+            href="/prompts/novo"
+            className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-sm" })}
+          >
+            <Plus className="size-3.5" />
+            Criar prompt
+          </Link>
+        </div>
       </div>
       <PromptsList prompts={withAuthor} />
     </section>

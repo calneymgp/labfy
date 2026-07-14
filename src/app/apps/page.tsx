@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Waypoints } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { App, AppWithAuthor } from "@/lib/apps";
+import { buttonVariants } from "@/components/ui/button";
 import { AppsGallery } from "./apps-gallery";
 
 export const metadata: Metadata = {
@@ -44,11 +47,20 @@ export default async function AppsPage() {
 
   return (
     <section className="mx-auto w-full max-w-5xl px-4 py-6">
-      <div className="mb-5 space-y-1">
-        <h1 className="font-heading text-xl font-semibold tracking-tight">Apps</h1>
-        <p className="text-xs text-muted-foreground">
-          O que a comunidade está construindo com IA.
-        </p>
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="font-heading text-xl font-semibold tracking-tight">Apps</h1>
+          <p className="text-xs text-muted-foreground">
+            O que a comunidade está construindo com IA.
+          </p>
+        </div>
+        <Link
+          href="/apps/mapa"
+          className={buttonVariants({ variant: "ghost", size: "sm", className: "rounded-sm" })}
+        >
+          <Waypoints className="size-3.5" />
+          Mapa
+        </Link>
       </div>
       <AppsGallery apps={withAuthor} categoryData={categoryData} />
     </section>
