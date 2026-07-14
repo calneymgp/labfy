@@ -1,6 +1,6 @@
 ---
 feature: plataforma-comunidade
-status: in-progress
+status: code-complete
 created: 2026-07-13
 brief: (origem: pedido falado do usuário, sintetizado pelo Tech Lead)
 ---
