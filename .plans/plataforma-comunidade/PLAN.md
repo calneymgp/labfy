@@ -429,8 +429,8 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
   1. Script de geração via `create-image-pixflux` (Bearer da key roteada por `PIXELLAB_KEYS`): salão com mesa redonda + 4 personagens 64x64 fiéis às personas (sábio chinês, americano moderno, Hermes grego, europeu). Salvar em `public/war-room/`.
   2. `scene.tsx`: compõe os 4 sprites ao redor da mesa sobre o fundo (posição absoluta), com estado de "quem está falando" (highlight/glow).
 - **acceptance:**
-  - [ ] `public/war-room/` contém ≥5 imagens (salão + 4 personagens)
-  - [ ] `scene.tsx` posiciona 4 personagens e aceita prop de "personagem ativo" (grep)
+  - [x] `public/war-room/` contém ≥5 imagens (salão + 4 personagens) — 5 PNGs gerados via PixelLab
+  - [x] `scene.tsx` posiciona 4 personagens e aceita prop de "personagem ativo" (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-13: War Room — orquestração do debate (Trigger.dev task)
@@ -563,3 +563,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — ⏸️ LOOP PAUSADO (cron 71067343 encerrado). War Room (task-11..15) bloqueada por dependências que exigem input humano: (1) conta Trigger.dev + TRIGGER_SECRET_KEY no ambiente/Coolify (não tenho); (2) /dev-brainstorm para travar endpoints/modelos reais dos 4 personagens. Retomar: prover o secret + brainstorm, então reativar /loop ou rodar /dev-coding a partir da task-11.
 - 2026-07-13 — ▶️ DESBLOQUEADO. Usuário forneceu Trigger.dev self-hosted (trigger.calney.com, projeto proj_ftdcvsxpsgyywqdnzxlc) + OpenRouter. Slugs travados/validados (HTTP 200): deepseek/deepseek-v4-pro, google/gemma-4-31b-it, nousresearch/hermes-4-405b, minimax/minimax-m3. Secrets em .env.local (gitignored). Retomando execução da task-11.
 - 2026-07-14 — task-11 ✅ fundação War Room: @trigger.dev/sdk 4.5.3 + react-hooks + trigger.config.ts (self-hosted) + migration war_room_sessions/messages (201, RLS dono) + characters.ts (4 personas + slugs OpenRouter) + sidebar item War Room + rota /war-room esqueleto. Gate verde. Loop reativado (cron e5b85637).
+- 2026-07-14 — task-12 ✅ 5 sprites pixel art gerados via PixelLab (salão + DeepSeek/Gemma/Hermes/MiniMax) em public/war-room/ + script gen-war-room-pixels.mjs (one-time) + scene.tsx (composição estática, 4 assentos ao redor da mesa, highlight do personagem ativo). Gate verde.
