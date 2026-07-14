@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, Send } from "lucide-react";
+import { Loader2, ArrowUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   CHARACTER_BY_ID,
   type CharacterId,
@@ -26,9 +27,9 @@ export function WarRoomClient({
   const [messages, setMessages] = React.useState<WarRoomMessage[]>(initialMessages);
   const [starting, setStarting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const bottomRef = React.useRef<HTMLDivElement>(null);
 
-  // Streaming + resumibilidade: assina novas falas e re-sincroniza a cada (re)conexão
-  // (cobre inserts perdidos durante desconexão / ao reabrir o navegador).
+  // Streaming + resumibilidade: assina novas falas e re-sincroniza a cada (re)conexão.
   React.useEffect(() => {
     if (!sessionId) return;
     const supabase = createClient();
@@ -69,6 +70,11 @@ export function WarRoomClient({
     };
   }, [sessionId]);
 
+  // Auto-scroll para a última fala (comportamento de chat).
+  React.useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
+
   async function handleStart() {
     setError(null);
     if (!prompt.trim()) return setError("Escreva um tema para o debate.");
@@ -77,6 +83,7 @@ export function WarRoomClient({
       const { error: e, sessionId: sid } = await startDebate(prompt);
       if (e) return setError(e);
       if (sid) {
+        setPrompt("");
         setMessages([]);
         setSessionId(sid);
       }
@@ -102,47 +109,25 @@ export function WarRoomClient({
           : null;
 
   return (
-    <div className="space-y-5">
-      <div className="flex gap-2">
-        <input
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleStart();
-          }}
-          placeholder="Sobre o que a mesa deve debater?"
-          className="h-9 flex-1 rounded-sm border border-input bg-card px-3 font-mono text-sm outline-none focus-visible:border-ring"
-        />
-        <Button onClick={handleStart} disabled={starting} className="rounded-sm">
-          {starting ? (
-            <Loader2 className="size-3.5 animate-spin" />
-          ) : (
-            <>
-              <Send className="size-3.5" /> Iniciar
-            </>
-          )}
-        </Button>
-      </div>
-      {error && <p className="text-xs text-exposed">{error}</p>}
+    <div className="mx-auto flex h-full w-full max-w-2xl flex-col">
+      {/* Área rolável: cena + falas */}
+      <div className="flex-1 space-y-4 overflow-y-auto px-1 pb-4">
+        <WarRoomScene />
 
-      {phaseLabel && (
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-            {phaseLabel}
-          </span>
-          {running && <Loader2 className="size-3 animate-spin text-muted-foreground" />}
-        </div>
-      )}
+        {phaseLabel && (
+          <div className="flex items-center justify-center gap-2">
+            <span className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+              {phaseLabel}
+            </span>
+            {running && <Loader2 className="size-3 animate-spin text-muted-foreground" />}
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div>
-          <WarRoomScene />
-        </div>
+        {sessionId && spoken.length === 0 && (
+          <p className="text-center text-xs text-muted-foreground">A mesa está se preparando…</p>
+        )}
 
-        <div className="max-h-[520px] space-y-2 overflow-y-auto">
-          {sessionId && spoken.length === 0 && (
-            <p className="text-xs text-muted-foreground">A mesa está se preparando…</p>
-          )}
+        <div className="space-y-3">
           {spoken.map((m) => {
             const c = CHARACTER_BY_ID.get(m.character as CharacterId);
             return (
@@ -162,21 +147,65 @@ export function WarRoomClient({
                     <span className="font-mono text-[9px] text-muted-foreground">· pesquisa</span>
                   )}
                 </div>
-                <p className="text-xs whitespace-pre-wrap text-foreground">{m.content}</p>
+                <p className="text-sm whitespace-pre-wrap text-foreground">{m.content}</p>
               </div>
             );
           })}
+
+          {conclusion && (
+            <div className="rounded-sm border border-foreground bg-foreground/[0.03] p-4">
+              <p className="mb-2 font-mono text-[10px] font-bold tracking-widest text-foreground uppercase">
+                Conclusão da mesa
+              </p>
+              <p className="text-sm whitespace-pre-wrap text-foreground">{conclusion.content}</p>
+            </div>
+          )}
         </div>
+
+        <div ref={bottomRef} />
       </div>
 
-      {conclusion && (
-        <div className="rounded-sm border border-foreground bg-foreground/[0.03] p-4">
-          <p className="mb-2 font-mono text-[10px] font-bold tracking-widest text-foreground uppercase">
-            Conclusão da mesa
-          </p>
-          <p className="text-sm whitespace-pre-wrap text-foreground">{conclusion.content}</p>
-        </div>
-      )}
+      {/* Prompt input fixo embaixo (estilo ChatGPT/Claude) */}
+      <div className="shrink-0 pt-2">
+        {error && <p className="mb-2 text-xs text-exposed">{error}</p>}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleStart();
+          }}
+          className="relative rounded-lg border border-input bg-card shadow-sm transition-colors focus-within:border-ring"
+        >
+          <Textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleStart();
+              }
+            }}
+            placeholder="Proponha um tema para a mesa debater…"
+            rows={1}
+            className="max-h-40 min-h-[52px] resize-none border-0 bg-transparent py-3.5 pr-12 text-sm shadow-none focus-visible:ring-0"
+          />
+          <Button
+            type="submit"
+            size="icon-sm"
+            disabled={starting || !prompt.trim()}
+            aria-label="Enviar"
+            className="absolute right-2 bottom-2 rounded-sm"
+          >
+            {starting ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <ArrowUp className="size-4" />
+            )}
+          </Button>
+        </form>
+        <p className="mt-1.5 text-center font-mono text-[10px] text-muted-foreground">
+          A mesa pesquisa, debate em 12 turnos e conclui · Enter envia, Shift+Enter quebra linha
+        </p>
+      </div>
     </div>
   );
 }
