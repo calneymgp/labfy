@@ -1,6 +1,6 @@
 ---
 feature: plataforma-comunidade
-status: ready
+status: in-progress
 created: 2026-07-13
 brief: (origem: pedido falado do usuário, sintetizado pelo Tech Lead)
 ---
@@ -558,3 +558,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-08 ✅ tabela apps (201, RLS: select público + escrita do dono) + grupo "Pessoal" no sidebar (Meu Perfil, só logado) + seção "Meus Apps" no /perfil (CRUD: nome/descrição/categoria/URL) via server actions restritas ao dono. Gate verde.
 - 2026-07-13 — task-09 ✅ galeria pública /apps (sidebar item Apps) + cards responsivos com autor via public_profiles + chart Bar por categoria + filtro por categoria. Gate verde. Bloco de Apps fechado.
 - 2026-07-13 — task-10 ✅ ForceGraph genérico (reusa motor d3-force) + /prompts/mapa (assunto→subtópico→prompt) + /apps/mapa (categoria→app) + links "Mapa" nas duas telas. DRIFT: mindmap intocado (ver Decisions). Gate verde. ÉPICO PRINCIPAL (task-01..10) FECHADO — restam só War Room (11-15) + smoke visuais humanos (02, mindmap).
+- 2026-07-13 — ⏸️ LOOP PAUSADO (cron 71067343 encerrado). War Room (task-11..15) bloqueada por dependências que exigem input humano: (1) conta Trigger.dev + TRIGGER_SECRET_KEY no ambiente/Coolify (não tenho); (2) /dev-brainstorm para travar endpoints/modelos reais dos 4 personagens. Retomar: prover o secret + brainstorm, então reativar /loop ou rodar /dev-coding a partir da task-11.
