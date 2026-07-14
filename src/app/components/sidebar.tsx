@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Home, Users, ScrollText, Boxes, Swords, Palette, Waypoints, ChevronUp, LogOut, LogIn, UserRound } from "lucide-react";
 import { signOut } from "@/app/entrar/actions";
 import { initialsOf } from "@/lib/profile";
+import { WAR_ROOM_ALLOWED_EMAILS } from "@/lib/war-room/characters";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
@@ -61,6 +62,10 @@ export function V6Sidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  const nav = WAR_ROOM_ALLOWED_EMAILS.includes(user?.email ?? "")
+    ? mainNav
+    : mainNav.filter((item) => item.href !== "/war-room");
+
   async function handleSignOut() {
     await signOut();
     router.push("/");
@@ -94,7 +99,7 @@ export function V6Sidebar({ user }: { user: SidebarUser }) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNav.map((item) => (
+              {nav.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     isActive={pathname === item.href}

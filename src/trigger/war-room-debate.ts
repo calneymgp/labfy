@@ -1,7 +1,6 @@
 import { task, logger } from "@trigger.dev/sdk";
 import { generateText } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { createClient } from "@supabase/supabase-js";
 import { WAR_ROOM_CHARACTERS } from "@/lib/war-room/characters";
 import { withWebSearch } from "@/lib/war-room/web-search";
 
@@ -15,27 +14,43 @@ export const warRoomDebate = task({
   retry: { maxAttempts: 1 },
   run: async (payload: WarRoomDebatePayload) => {
     const openrouter = createOpenRouter({ apiKey: process.env.OPENROUTER_API_KEY });
-    const supabase = createClient(
-      process.env.SUPABASE_URL as string,
-      process.env.SUPABASE_SERVICE_ROLE_KEY as string,
-      { auth: { persistSession: false } }
-    );
+
+    // Escreve no Supabase via PostgREST (fetch direto) — evita o supabase-js, cujo
+    // cliente Realtime exige WebSocket nativo, indisponível no runtime do Trigger.dev.
+    const SB_URL = process.env.SUPABASE_URL as string;
+    const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+    const sbHeaders = {
+      apikey: SB_KEY,
+      Authorization: `Bearer ${SB_KEY}`,
+      "Content-Type": "application/json",
+    };
 
     const setStatus = (status: string) =>
-      supabase.from("war_room_sessions").update({ status }).eq("id", payload.sessionId);
+      fetch(`${SB_URL}/rest/v1/war_room_sessions?id=eq.${payload.sessionId}`, {
+        method: "PATCH",
+        headers: sbHeaders,
+        body: JSON.stringify({ status }),
+      });
 
     const addMessage = (character: string, phase: string, content: string, turn: number) =>
-      supabase.from("war_room_messages").insert({
-        session_id: payload.sessionId,
-        character,
-        phase,
-        content,
-        turn,
+      fetch(`${SB_URL}/rest/v1/war_room_messages`, {
+        method: "POST",
+        headers: sbHeaders,
+        body: JSON.stringify({
+          session_id: payload.sessionId,
+          character,
+          phase,
+          content,
+          turn,
+        }),
       });
 
     try {
       // Idempotência: se a task re-rodar (retry/reenvio), recomeça sem duplicar falas.
-      await supabase.from("war_room_messages").delete().eq("session_id", payload.sessionId);
+      await fetch(`${SB_URL}/rest/v1/war_room_messages?session_id=eq.${payload.sessionId}`, {
+        method: "DELETE",
+        headers: sbHeaders,
+      });
 
       // FASE 1 — RESEARCH: cada personagem pesquisa na web (:online), em paralelo.
       // allSettled: a falha de um modelo não derruba o debate.

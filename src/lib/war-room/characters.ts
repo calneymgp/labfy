@@ -75,3 +75,6 @@ export type WarRoomMessage = {
   content: string;
   turn: number;
 };
+
+// War Room é restrita a estes emails (acesso liberado sob demanda).
+export const WAR_ROOM_ALLOWED_EMAILS = ["calneymgp@gmail.com"];

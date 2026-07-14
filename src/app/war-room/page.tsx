@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { WarRoomMessage } from "@/lib/war-room/characters";
+import { WAR_ROOM_ALLOWED_EMAILS, type WarRoomMessage } from "@/lib/war-room/characters";
 import { WarRoomClient } from "./war-room-client";
 
 export const metadata: Metadata = {
@@ -14,6 +14,7 @@ export default async function WarRoomPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/entrar");
+  if (!WAR_ROOM_ALLOWED_EMAILS.includes(user.email ?? "")) redirect("/");
 
   // Resumibilidade: retoma a sessão mais recente do usuário (se houver).
   const { data: session } = await supabase
