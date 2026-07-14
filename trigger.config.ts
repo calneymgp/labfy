@@ -2,7 +2,7 @@ import { defineConfig } from "@trigger.dev/sdk";
 
 // Self-hosted: TRIGGER_API_URL e TRIGGER_SECRET_KEY vêm do ambiente (.env.local / Coolify).
 export default defineConfig({
-  project: "proj_ftdcvsxpsgyywqdnzxlc",
+  project: "proj_mjiflhfpfsmescrpmqsn",
   dirs: ["./src/trigger"],
   maxDuration: 3600,
   retries: {
