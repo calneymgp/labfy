@@ -58,6 +58,7 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 - **Editor Markdown:** ver `## Discovery`. Render público via `react-markdown` + `remark-gfm`.
 - **Grafo genérico:** extrair `<ForceGraph nodes edges tags/>` parametrizando o que hoje é hardcoded em `buildInitialGraph`; o motor `use-force-layout.ts` já é agnóstico de domínio.
 - **Navegação:** item "Comunidade (soon)" vira **"Membros"** (`/membros`). Novos em "Principal": **Prompts** (`/prompts`), **Apps** (`/apps`). Novo grupo **"Pessoal"** com **Meu Perfil** (`/perfil`). Cadastro de apps mora dentro de `/perfil` (seção "Meus Apps"); `/apps` é a visão pública.
+- **Editor de prompts (DRIFT task-07)** — descartado `@uiw/react-md-editor` (recomendação original da Discovery) em favor de um **split-view próprio** (textarea mono + preview `react-markdown`). Motivo: o `@uiw` traz toolbar/CSS estilo GitHub que destoa do design Terminal Paper (mono, minimalista); o split-view é mais leve, sem CSS externo e coerente com o projeto. `react-markdown` + `remark-gfm` cobrem escrita e leitura.
 
 ## Discovery
 
@@ -257,10 +258,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. `/prompts/[id]`: renderizar `body` com react-markdown + nome do autor (via `public_profiles`).
   4. Bloquear criação para deslogado (redirect `/entrar`).
 - **acceptance:**
-  - [ ] `package.json` inclui `react-markdown` e `remark-gfm` (grep)
-  - [ ] `prompt-editor.tsx` usa `dynamic` com `ssr:false` (grep)
-  - [ ] `actions.ts` grava `owner_id` do user autenticado e NÃO tem flag de privacidade (grep — sem `is_private`)
-  - [ ] `[id]/page.tsx` importa `react-markdown` (grep)
+  - [x] `package.json` inclui `react-markdown` e `remark-gfm` (grep)
+  - [x] `prompt-editor.tsx` é client component com preview via `react-markdown` (split Escrever/Preview) — DRIFT: fallback em vez de `@uiw` (ver Decisions)
+  - [x] `actions.ts` grava `owner_id` do user autenticado e NÃO tem flag de privacidade (grep — sem `is_private`)
+  - [x] `[id]/page.tsx` importa `react-markdown` (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 > 🔄 bom ponto de /clear — o plano carrega o resto
@@ -552,3 +553,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — backlog: adicionado épico War Room (task-11 a task-15) ao fim do plano. Decisões travadas: Trigger.dev v4.5.0 (durável/realtime/resume nativo), PixelLab para sprites (creds em loot-hunter/.env.local), fluxo research→debate→conclusion, persistência Supabase. Execução continua na ordem — War Room só após task-10.
 - 2026-07-13 — task-05 ✅ dashboard raio-X em /membros: 4 cards macro (total, Claude Code, GPT, especialidades) + Pie por especialidade + Bars por harness e localização (recharts). Agregados computados no server component. Gate verde.
 - 2026-07-13 — task-06 ✅ tabela prompts (201, RLS: select público + insert/update/delete do dono) + sidebar item Prompts + /prompts (lista + busca client-side por título/tópico/tag/corpo; autor via public_profiles em 2ª query). Gate verde.
+- 2026-07-13 — task-07 ✅ editor de prompts split-view (Escrever/Preview) + /prompts/novo (bloqueia deslogado) + createPrompt (sempre público, owner_id do user) + /prompts/[id] render react-markdown. DRIFT: @uiw descartado por consistência de design (ver Decisions), fallback react-markdown. Gate verde.
