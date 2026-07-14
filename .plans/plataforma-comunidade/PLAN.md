@@ -502,8 +502,8 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
   1. Ao abrir `/war-room` com sessão em andamento, reidratar de `war_room_messages` e **reconectar** o stream da Session (externalId) — retomar de onde parou.
   2. Retries/idempotência na task; tratamento de falha de um agente sem derrubar o debate.
 - **acceptance:**
-  - [ ] reabrir a rota reconecta o stream por `externalId` (grep) e reidrata mensagens do Supabase (grep)
-  - [ ] a task define política de retry (grep `retry`)
+  - [x] reabrir a rota reidrata mensagens do Supabase e re-sincroniza a cada (re)conexão — DRIFT: resume via `session_id` (Supabase Realtime), não `externalId` do run
+  - [x] a task define política de `retry` + idempotência (delete no início) + resiliência (allSettled na research, try/catch por turno)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ---
@@ -575,3 +575,5 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-14 — task-12 ✅ 5 sprites pixel art gerados via PixelLab (salão + DeepSeek/Gemma/Hermes/MiniMax) em public/war-room/ + script gen-war-room-pixels.mjs (one-time) + scene.tsx (composição estática, 4 assentos ao redor da mesa, highlight do personagem ativo). Gate verde.
 - 2026-07-14 — task-13 ✅ task Trigger.dev war-room-debate: research (4 agentes :online paralelo) → debate (12 turnos rotativos, contexto compartilhado) → conclusion; persiste cada fala em war_room_messages via supabase-js service_role. AI SDK 7 + OpenRouter provider. DRIFT: service_role + :online (ver Decisions). Gate verde.
 - 2026-07-14 — task-14 ✅ frontend /war-room: input dispara startDebate (cria sessão + tasks.trigger + external_id); war-room-client streama via Supabase Realtime (postgres_changes), cena com highlight de quem fala, painel de falas por personagem, conclusão destacada; page reidrata a sessão mais recente. Realtime habilitado na publication (201). DRIFT: Supabase Realtime (ver Decisions). Gate verde.
+- 2026-07-14 — task-15 ✅ resumibilidade+robustez: re-sync no reconnect (SUBSCRIBED) + dedup por id; indicador de fase (pesquisando/debatendo/concluído); idempotência (delete no início da task); resiliência (allSettled na research, try/catch por turno — falha de 1 modelo não derruba o debate). Gate verde.
+- 2026-07-14 — 🏁 CÓDIGO DO ÉPICO COMPLETO (task-01..15, 15/15). Pendências que exigem HUMANO: (a) smoke visual Perfil (task-02) e MindMap; (b) `npx trigger.dev deploy` (precisa TRIGGER access token, não o secret) para publicar a task no trigger.calney.com; (c) replicar as 6 secrets do .env.local no Coolify. Sem (b)+(c) a War Room cria a sessão mas o debate não roda. Loop encerrado.

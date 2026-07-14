@@ -17,9 +17,11 @@ const CHARACTER_IDS: CharacterId[] = ["deepseek", "gemma", "hermes", "minimax"];
 export function WarRoomClient({
   initialSessionId,
   initialMessages,
+  initialStatus,
 }: {
   initialSessionId: string | null;
   initialMessages: WarRoomMessage[];
+  initialStatus: string | null;
 }) {
   const [prompt, setPrompt] = React.useState("");
   const [sessionId, setSessionId] = React.useState<string | null>(initialSessionId);
@@ -27,20 +29,23 @@ export function WarRoomClient({
   const [starting, setStarting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  // Streaming + resumibilidade: recarrega o histórico e assina novas falas (Supabase Realtime).
+  // Streaming + resumibilidade: assina novas falas e re-sincroniza a cada (re)conexão
+  // (cobre inserts perdidos durante desconexão / ao reabrir o navegador).
   React.useEffect(() => {
     if (!sessionId) return;
     const supabase = createClient();
 
-    supabase
-      .from("war_room_messages")
-      .select("id, character, phase, content, turn")
-      .eq("session_id", sessionId)
-      .order("turn")
-      .order("created_at")
-      .then(({ data }) => {
-        if (data) setMessages(data as WarRoomMessage[]);
-      });
+    const sync = () => {
+      supabase
+        .from("war_room_messages")
+        .select("id, character, phase, content, turn")
+        .eq("session_id", sessionId)
+        .order("turn")
+        .order("created_at")
+        .then(({ data }) => {
+          if (data) setMessages(data as WarRoomMessage[]);
+        });
+    };
 
     const channel = supabase
       .channel(`war-room-${sessionId}`)
@@ -53,10 +58,13 @@ export function WarRoomClient({
           filter: `session_id=eq.${sessionId}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as WarRoomMessage]);
+          const msg = payload.new as WarRoomMessage;
+          setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") sync();
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -89,6 +97,17 @@ export function WarRoomClient({
       ? (lastSpeaker.character as CharacterId)
       : null;
 
+  const running = !conclusion && (spoken.length > 0 || Boolean(sessionId));
+  const phaseLabel = conclusion
+    ? "Concluído"
+    : initialStatus === "error" && spoken.length === 0
+      ? "Falhou — tente de novo"
+      : spoken.length > 0
+        ? "Debatendo…"
+        : sessionId
+          ? "Pesquisando…"
+          : null;
+
   return (
     <div className="space-y-5">
       <div className="flex gap-2">
@@ -112,6 +131,15 @@ export function WarRoomClient({
         </Button>
       </div>
       {error && <p className="text-xs text-exposed">{error}</p>}
+
+      {phaseLabel && (
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+            {phaseLabel}
+          </span>
+          {running && <Loader2 className="size-3 animate-spin text-muted-foreground" />}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div>

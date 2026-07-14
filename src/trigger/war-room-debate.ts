@@ -34,9 +34,13 @@ export const warRoomDebate = task({
       });
 
     try {
+      // Idempotência: se a task re-rodar (retry/reenvio), recomeça sem duplicar falas.
+      await supabase.from("war_room_messages").delete().eq("session_id", payload.sessionId);
+
       // FASE 1 — RESEARCH: cada personagem pesquisa na web (:online), em paralelo.
+      // allSettled: a falha de um modelo não derruba o debate.
       await setStatus("researching");
-      const research = await Promise.all(
+      const settled = await Promise.allSettled(
         WAR_ROOM_CHARACTERS.map(async (c) => {
           const { text } = await generateText({
             model: openrouter(withWebSearch(c.model)),
@@ -48,6 +52,11 @@ export const warRoomDebate = task({
           await addMessage(c.id, "research", text, 0);
           return { name: c.name, findings: text };
         })
+      );
+      const research = settled.map((r, i) =>
+        r.status === "fulfilled"
+          ? r.value
+          : { name: WAR_ROOM_CHARACTERS[i].name, findings: "(não trouxe pesquisa desta vez)" }
       );
 
       // FASE 2 — DEBATE: turnos rotativos, todos veem tudo.
@@ -63,14 +72,21 @@ export const warRoomDebate = task({
             : "Você abre o debate.",
           `Sua vez (${c.name}). Traga um ponto novo e reaja aos outros.`,
         ].join("\n\n");
-        const { text } = await generateText({
-          model: openrouter(c.model),
-          system: c.systemPrompt,
-          prompt: context,
-        });
-        await addMessage(c.id, "debate", text, turn);
-        transcript.push({ name: c.name, text });
-        logger.info(`turno ${turn} — ${c.name}`);
+        try {
+          const { text } = await generateText({
+            model: openrouter(c.model),
+            system: c.systemPrompt,
+            prompt: context,
+          });
+          await addMessage(c.id, "debate", text, turn);
+          transcript.push({ name: c.name, text });
+          logger.info(`turno ${turn} — ${c.name}`);
+        } catch (turnErr) {
+          // um turno que falha não derruba o debate — segue para o próximo.
+          logger.warn(`turno ${turn} — ${c.name} falhou, seguindo`, {
+            error: String(turnErr),
+          });
+        }
       }
 
       // FASE 3 — CONCLUSION: síntese final da mesa.

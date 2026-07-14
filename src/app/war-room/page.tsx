@@ -18,13 +18,15 @@ export default async function WarRoomPage() {
   // Resumibilidade: retoma a sessão mais recente do usuário (se houver).
   const { data: session } = await supabase
     .from("war_room_sessions")
-    .select("id")
+    .select("id, status")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const sessionId = session ? (session as { id: string }).id : null;
+  const typedSession = session as { id: string; status: string } | null;
+  const sessionId = typedSession ? typedSession.id : null;
+  const status = typedSession ? typedSession.status : null;
 
   let messages: WarRoomMessage[] = [];
   if (sessionId) {
@@ -45,7 +47,11 @@ export default async function WarRoomPage() {
           Quatro modelos de IA debatem o seu prompt até uma conclusão.
         </p>
       </div>
-      <WarRoomClient initialSessionId={sessionId} initialMessages={messages} />
+      <WarRoomClient
+        initialSessionId={sessionId}
+        initialMessages={messages}
+        initialStatus={status}
+      />
     </section>
   );
 }
