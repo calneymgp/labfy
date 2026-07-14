@@ -538,6 +538,19 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
   - [x] `whatsapp` NÃO está na view `public_profiles` (verificado no banco: vazio)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
+### task-17: War Room — arte real (vídeo) + conclusão garantida
+
+- **type:** `auto` · **effort:** `S` · **depends_on:** [`task-12`, `task-13`]
+- **action:**
+  1. Substituir os sprites pixel gerados pela **arte fornecida pelo usuário**: vídeo animado otimizado (`scene.mp4`, ~116KB via ffmpeg, `<video>` autoplay/loop/muted em vez de GIF — mais leve) + poster estático. Remover os 5 sprites antigos e o script de geração.
+  2. `scene.tsx` vira peça única (a mesa e os 4 personagens já estão na arte); remover highlight posicional do client.
+  3. **Conclusão garantida (~100%):** fase conclusion tenta cada modelo até um responder + fallback textual; turnos finais orientados a convergir.
+- **acceptance:**
+  - [x] `public/war-room/scene.mp4` existe e sprites antigos removidos
+  - [x] `scene.tsx` usa `<video>` (grep) e não referencia mais os sprites individuais
+  - [x] `war-room-debate.ts` conclui com loop de fallback entre modelos (grep) + fallback textual
+- **must_pass:** `pnpm typecheck && pnpm lint`
+
 ---
 
 ## Must-Haves (goal-backward verification)
@@ -610,4 +623,5 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-14 — task-15 ✅ resumibilidade+robustez: re-sync no reconnect (SUBSCRIBED) + dedup por id; indicador de fase (pesquisando/debatendo/concluído); idempotência (delete no início da task); resiliência (allSettled na research, try/catch por turno — falha de 1 modelo não derruba o debate). Gate verde.
 - 2026-07-14 — task-16 ✅ (extra) WhatsApp no perfil: PhoneInput com bandeiras + código de país (defaultCountry BR), validação libphonenumber-js, coluna whatsapp (aditiva). NÃO exposto na view pública (LGPD confirmado no banco). Gate verde.
 - 2026-07-14 — 🔴 deploy da War Room BLOQUEADO (devops confirmou no Postgres do Trigger): `proj_ftdcvsxpsgyywqdnzxlc` é o projeto de PRODUÇÃO do TAMZ, não existe projeto "labfydev". Comando de deploy correto: `rtk proxy npx --yes trigger.dev@4.5.3 deploy --api-url "$TRIGGER_API_URL"` (SEM --local-build/--self-hosted; --local-build liga registry ECR-cloud inexistente no self-hosted). DECISÃO do usuário: criar projeto labfydev novo na UI. Aguardando novo proj_ref + secret key (tr_prod_) para atualizar trigger.config.ts + .env.local e deployar isolado + configurar env vars de runtime (OPENROUTER_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY).
-- 2026-07-14 — 🏁 CÓDIGO DO ÉPICO COMPLETO (task-01..16, 16/16). Pendências que exigem HUMANO: (a) smoke visual Perfil (task-02) e MindMap; (b) `npx trigger.dev deploy` (precisa TRIGGER access token, não o secret) para publicar a task no trigger.calney.com; (c) replicar as 6 secrets do .env.local no Coolify. Sem (b)+(c) a War Room cria a sessão mas o debate não roda. Loop encerrado.
+- 2026-07-14 — task-17 ✅ (extra) War Room usa a ARTE do usuário: vídeo otimizado (2,3M→116KB via ffmpeg-static) como `<video>` leve + poster; removidos os 5 sprites gerados + script. Conclusão GARANTIDA (~100%): loop de fallback entre os 4 modelos + fallback textual; turnos finais orientados a convergir. Gate verde.
+- 2026-07-14 — 🏁 CÓDIGO DO ÉPICO COMPLETO (task-01..17, 17/17). Pendências que exigem HUMANO: (a) smoke visual Perfil (task-02) e MindMap; (b) `npx trigger.dev deploy` (precisa TRIGGER access token, não o secret) para publicar a task no trigger.calney.com; (c) replicar as 6 secrets do .env.local no Coolify. Sem (b)+(c) a War Room cria a sessão mas o debate não roda. Loop encerrado.

@@ -12,8 +12,6 @@ import {
 import { WarRoomScene } from "./scene";
 import { startDebate } from "./actions";
 
-const CHARACTER_IDS: CharacterId[] = ["deepseek", "gemma", "hermes", "minimax"];
-
 export function WarRoomClient({
   initialSessionId,
   initialMessages,
@@ -91,11 +89,6 @@ export function WarRoomClient({
 
   const spoken = messages.filter((m) => m.phase === "debate" || m.phase === "research");
   const conclusion = messages.find((m) => m.phase === "conclusion");
-  const lastSpeaker = [...messages].reverse().find((m) => m.character !== "system");
-  const activeId =
-    lastSpeaker && CHARACTER_IDS.includes(lastSpeaker.character as CharacterId)
-      ? (lastSpeaker.character as CharacterId)
-      : null;
 
   const running = !conclusion && (spoken.length > 0 || Boolean(sessionId));
   const phaseLabel = conclusion
@@ -143,7 +136,7 @@ export function WarRoomClient({
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <div>
-          <WarRoomScene activeId={activeId} />
+          <WarRoomScene />
         </div>
 
         <div className="max-h-[520px] space-y-2 overflow-y-auto">

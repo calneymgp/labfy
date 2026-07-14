@@ -70,7 +70,9 @@ export const warRoomDebate = task({
           transcript.length
             ? `Debate até agora:\n${transcript.map((t) => `${t.name}: ${t.text}`).join("\n")}`
             : "Você abre o debate.",
-          `Sua vez (${c.name}). Traga um ponto novo e reaja aos outros.`,
+          turn > TURNS - 3
+            ? `Sua vez (${c.name}). Estamos perto do fim — busque CONVERGIR para uma conclusão acionável, reconhecendo os melhores pontos dos outros.`
+            : `Sua vez (${c.name}). Traga um ponto novo e reaja aos outros.`,
         ].join("\n\n");
         try {
           const { text } = await generateText({
@@ -89,16 +91,35 @@ export const warRoomDebate = task({
         }
       }
 
-      // FASE 3 — CONCLUSION: síntese final da mesa.
-      const { text: conclusion } = await generateText({
-        model: openrouter(WAR_ROOM_CHARACTERS[0].model),
-        system:
-          "Você é o moderador da mesa. Sintetize o debate numa conclusão final equilibrada, em português.",
-        prompt:
-          `Pergunta: ${payload.prompt}\n\nDebate:\n` +
-          transcript.map((t) => `${t.name}: ${t.text}`).join("\n") +
-          `\n\nEscreva a conclusão final da mesa (5-8 frases).`,
-      });
+      // FASE 3 — CONCLUSION: síntese final GARANTIDA — tenta cada modelo até um dar certo,
+      // com fallback textual. A mesa precisa concluir em ~100% das vezes.
+      let conclusion = "";
+      for (const c of WAR_ROOM_CHARACTERS) {
+        try {
+          const { text } = await generateText({
+            model: openrouter(c.model),
+            system:
+              "Você é o moderador da mesa. Produza SEMPRE uma conclusão final clara e acionável em " +
+              "português, mesmo diante de divergência — nesse caso, aponte o consenso possível e a " +
+              "recomendação mais defensável. Nunca termine sem uma posição.",
+            prompt:
+              `Pergunta: ${payload.prompt}\n\nDebate:\n` +
+              transcript.map((t) => `${t.name}: ${t.text}`).join("\n") +
+              `\n\nEscreva a conclusão final da mesa (5-8 frases), terminando com uma recomendação objetiva.`,
+          });
+          conclusion = text;
+          break;
+        } catch (concErr) {
+          logger.warn(`conclusão via ${c.name} falhou, tentando próximo modelo`, {
+            error: String(concErr),
+          });
+        }
+      }
+      if (!conclusion) {
+        conclusion =
+          "A mesa debateu o tema mas não conseguiu gerar a síntese automática desta vez. " +
+          "As posições de cada participante estão acima — a recomendação predominante deve ser extraída delas.";
+      }
       await addMessage("system", "conclusion", conclusion, TURNS + 1);
       await setStatus("concluded");
 
