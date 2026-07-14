@@ -313,9 +313,9 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. Gráfico por categoria (recharts, Pie/Bar) no topo.
   4. Filtro por categoria.
 - **acceptance:**
-  - [ ] `sidebar.tsx` contém href `/apps` (grep)
-  - [ ] `apps/page.tsx` lê tabela `apps` + autor via `public_profiles` (grep)
-  - [ ] `apps-gallery.tsx` agrupa por `category` para o chart (grep)
+  - [x] `sidebar.tsx` contém href `/apps` (grep)
+  - [x] `apps/page.tsx` lê tabela `apps` + autor via `public_profiles` (grep)
+  - [x] `apps-gallery.tsx` agrupa por `category` para o chart (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 > 🔄 bom ponto de /clear — o plano carrega o resto
@@ -555,3 +555,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-06 ✅ tabela prompts (201, RLS: select público + insert/update/delete do dono) + sidebar item Prompts + /prompts (lista + busca client-side por título/tópico/tag/corpo; autor via public_profiles em 2ª query). Gate verde.
 - 2026-07-13 — task-07 ✅ editor de prompts split-view (Escrever/Preview) + /prompts/novo (bloqueia deslogado) + createPrompt (sempre público, owner_id do user) + /prompts/[id] render react-markdown. DRIFT: @uiw descartado por consistência de design (ver Decisions), fallback react-markdown. Gate verde.
 - 2026-07-13 — task-08 ✅ tabela apps (201, RLS: select público + escrita do dono) + grupo "Pessoal" no sidebar (Meu Perfil, só logado) + seção "Meus Apps" no /perfil (CRUD: nome/descrição/categoria/URL) via server actions restritas ao dono. Gate verde.
+- 2026-07-13 — task-09 ✅ galeria pública /apps (sidebar item Apps) + cards responsivos com autor via public_profiles + chart Bar por categoria + filtro por categoria. Gate verde. Bloco de Apps fechado.
