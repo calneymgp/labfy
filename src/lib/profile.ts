@@ -11,6 +11,20 @@ export type Profile = {
   skills: string[];
 };
 
+// Projeção pública (view public_profiles) — nunca inclui email/phone.
+export type PublicMember = {
+  id: string;
+  full_name: string;
+  headline: string;
+  avatar_url: string | null;
+  specialty: string;
+  role: string;
+  location: string;
+  skills: string[];
+  preferred_models: string[];
+  preferred_harnesses: string[];
+};
+
 export const MODEL_OPTIONS = [
   "Claude",
   "GPT (OpenAI)",

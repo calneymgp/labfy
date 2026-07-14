@@ -172,10 +172,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
   3. `/membros` (Server Component): ler `public_profiles`, passar para o client `members-directory`.
   4. `members-directory`: grid de cards responsivo (1 col mobile → N desktop) + filtros por especialidade (select), nome (input), cargo (input), localização (input). Nenhum campo de email/phone em lugar nenhum.
 - **acceptance:**
-  - [ ] Migration cria `public_profiles` e o `.sql` NÃO contém `email`/`phone` na lista de colunas (grep)
-  - [ ] `sidebar.tsx` contém item com href `/membros` (grep)
-  - [ ] `src/app/membros/page.tsx` lê de `public_profiles` e NÃO referencia `email`/`phone` (grep)
-  - [ ] `members-directory.tsx` tem os 4 filtros (grep `specialty`, `location`, e inputs de nome/cargo)
+  - [x] Migration cria `public_profiles` e o `.sql` NÃO contém `email`/`phone` na lista de colunas (grep)
+  - [x] `sidebar.tsx` contém item com href `/membros` (grep)
+  - [x] `src/app/membros/page.tsx` lê de `public_profiles` e NÃO referencia `email`/`phone` (grep)
+  - [x] `members-directory.tsx` tem os 4 filtros (grep `specialty`, `location`, e inputs de nome/cargo)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-05: Dashboard raio-X da comunidade (cards + gráficos)
@@ -394,3 +394,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-13 — task-01 ✅ avatar `size-28`, fundo branco no canvas do crop + `bg-white` no AvatarImage, `pt-5` de respiro do botão. Gate verde.
 - 2026-07-13 — task-02 ⏸️ aguardando smoke visual humano (Playwright/perfil exige login). NÃO bloqueia demais tasks — seguindo para task-03.
 - 2026-07-13 — task-03 ✅ colunas specialty/role/location/skills aplicadas no banco (Management API, status 201, verificadas) + form estendido (especialidade ToggleChips, cargo/local inputs, skills chips) + validação server-side. Gate verde.
+- 2026-07-13 — task-04 ✅ view public_profiles criada (201, colunas verificadas SEM email/phone, vazamento=0) + sidebar Comunidade→Membros + /membros com diretório filtrável (nome/especialidade/cargo/localização) + /comunidade redireciona. Gate verde.
