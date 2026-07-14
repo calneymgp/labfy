@@ -58,6 +58,10 @@ Três áreas públicas novas alimentadas pelo Supabase — **Membros** (diretór
 - **Editor Markdown:** ver `## Discovery`. Render público via `react-markdown` + `remark-gfm`.
 - **Grafo genérico:** extrair `<ForceGraph nodes edges tags/>` parametrizando o que hoje é hardcoded em `buildInitialGraph`; o motor `use-force-layout.ts` já é agnóstico de domínio.
 - **Navegação:** item "Comunidade (soon)" vira **"Membros"** (`/membros`). Novos em "Principal": **Prompts** (`/prompts`), **Apps** (`/apps`). Novo grupo **"Pessoal"** com **Meu Perfil** (`/perfil`). Cadastro de apps mora dentro de `/perfil` (seção "Meus Apps"); `/apps` é a visão pública.
+- **War Room realtime (DRIFT task-14)** — streaming via **Supabase Realtime** (`postgres_changes`
+  em `war_room_messages`) em vez de `useTriggerChatTransport`. As mensagens já são a fonte da verdade
+  no Supabase; assinar a tabela dá streaming **e** resumibilidade sem acoplar o frontend ao run do
+  Trigger.dev. Exigiu `alter publication supabase_realtime add table war_room_messages`.
 - **War Room persistência + web search (DRIFT task-13)** — (1) dentro da task Trigger.dev uso
   `supabase-js` com **service_role key** (stateless, bypassa RLS) em vez de `pg.Pool` — o Supabase
   aqui é cloud, não self-hosted, e não há DATABASE_URL/senha do Postgres. (2) Web search via
@@ -477,9 +481,9 @@ um `/dev-brainstorm` curto para travar **endpoints/modelos reais disponíveis** 
   1. Input de prompt; ao enviar, cria `war_room_sessions` e dispara a task Trigger.dev (externalId = session id).
   2. `useChat` + `useTriggerChatTransport` streamando as falas; renderizar cada intervenção no personagem correspondente (balão/painel) + highlight na cena; conclusão final destacada.
 - **acceptance:**
-  - [ ] `war-room-client.tsx` usa `useChat`/`useTriggerChatTransport` (grep)
-  - [ ] `actions.ts` cria sessão e dispara a task com `externalId` (grep)
-  - [ ] falas são renderizadas por personagem (grep)
+  - [x] `war-room-client.tsx` streama falas em realtime — DRIFT: **Supabase Realtime** (`postgres_changes`) em vez de `useTriggerChatTransport` (ver Decisions)
+  - [x] `actions.ts` cria sessão e dispara a task (`tasks.trigger`) e grava `external_id` (grep)
+  - [x] falas são renderizadas por personagem (`CHARACTER_BY_ID`) (grep)
 - **must_pass:** `pnpm typecheck && pnpm lint`
 
 ### task-15: War Room — resumibilidade + robustez
@@ -570,3 +574,4 @@ Atualizado por `/dev-coding` durante execução. Não preencher antes.
 - 2026-07-14 — task-11 ✅ fundação War Room: @trigger.dev/sdk 4.5.3 + react-hooks + trigger.config.ts (self-hosted) + migration war_room_sessions/messages (201, RLS dono) + characters.ts (4 personas + slugs OpenRouter) + sidebar item War Room + rota /war-room esqueleto. Gate verde. Loop reativado (cron e5b85637).
 - 2026-07-14 — task-12 ✅ 5 sprites pixel art gerados via PixelLab (salão + DeepSeek/Gemma/Hermes/MiniMax) em public/war-room/ + script gen-war-room-pixels.mjs (one-time) + scene.tsx (composição estática, 4 assentos ao redor da mesa, highlight do personagem ativo). Gate verde.
 - 2026-07-14 — task-13 ✅ task Trigger.dev war-room-debate: research (4 agentes :online paralelo) → debate (12 turnos rotativos, contexto compartilhado) → conclusion; persiste cada fala em war_room_messages via supabase-js service_role. AI SDK 7 + OpenRouter provider. DRIFT: service_role + :online (ver Decisions). Gate verde.
+- 2026-07-14 — task-14 ✅ frontend /war-room: input dispara startDebate (cria sessão + tasks.trigger + external_id); war-room-client streama via Supabase Realtime (postgres_changes), cena com highlight de quem fala, painel de falas por personagem, conclusão destacada; page reidrata a sessão mais recente. Realtime habilitado na publication (201). DRIFT: Supabase Realtime (ver Decisions). Gate verde.

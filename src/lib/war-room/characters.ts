@@ -67,3 +67,11 @@ export const WAR_ROOM_CHARACTERS: WarRoomCharacter[] = [
 ];
 
 export const CHARACTER_BY_ID = new Map(WAR_ROOM_CHARACTERS.map((c) => [c.id, c]));
+
+export type WarRoomMessage = {
+  id: string;
+  character: string;
+  phase: string;
+  content: string;
+  turn: number;
+};
