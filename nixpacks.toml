@@ -1,0 +1,5 @@
+# O Nixpacks traz um commit do nixpkgs fixo (ffeebf0a → Node 22.11.0), vulnerável ao
+# node2shell (CVE-2026-111497, Brotli). Pin num commit do master avaliado pelo Hydra, com
+# nodejs_22 22.23.4 no cache.nixos.org. Pode sair quando o default do Nixpacks tiver ≥ 22.23.4.
+[phases.setup]
+nixpkgsArchive = "d3b13ad75cc492690728f9307e443dec9ef9a20e"
